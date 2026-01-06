@@ -127,6 +127,40 @@ function setupEventListeners() {
         });
     }
     
+    // Обработчик для меню пользователя
+    const userMenuBtn = document.getElementById('userMenuBtn');
+    const userPopup = document.getElementById('userPopup');
+    if (userMenuBtn && userPopup) {
+        userMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            // Проверяем текущее состояние
+            const currentDisplay = window.getComputedStyle(userPopup).display;
+            const isVisible = currentDisplay !== 'none';
+            userPopup.style.display = isVisible ? 'none' : 'block';
+        });
+        
+        // Закрытие popup при клике вне его
+        document.addEventListener('click', (e) => {
+            if (userMenuBtn && userPopup && 
+                !userMenuBtn.contains(e.target) && 
+                !userPopup.contains(e.target)) {
+                userPopup.style.display = 'none';
+            }
+        });
+    }
+    
+    // Обработчик для проверки обновлений
+    const checkUpdateMenuItem = document.getElementById('checkUpdateMenuItem');
+    if (checkUpdateMenuItem) {
+        checkUpdateMenuItem.addEventListener('click', async () => {
+            const userPopup = document.getElementById('userPopup');
+            if (userPopup) userPopup.style.display = 'none';
+            const { checkForUpdates } = await import('./app-update.js');
+            await checkForUpdates(true);
+        });
+    }
+    
     // Обработчик для вкладки статистики
     const statsMenuItem = document.getElementById('statsMenuItem');
     if (statsMenuItem) {

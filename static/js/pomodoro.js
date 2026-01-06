@@ -123,20 +123,7 @@ function setupPomodoroListeners() {
         stopBtnMobile.addEventListener('click', stopPomodoro);
     }
     
-    if (userMenuBtn && userPopup) {
-        userMenuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isVisible = userPopup.style.display !== 'none';
-            userPopup.style.display = isVisible ? 'none' : 'block';
-        });
-        
-        // Закрытие popup при клике вне его
-        document.addEventListener('click', (e) => {
-            if (!userMenuBtn.contains(e.target) && !userPopup.contains(e.target)) {
-                userPopup.style.display = 'none';
-            }
-        });
-    }
+    // Обработчик меню пользователя перенесен в main.js для избежания конфликтов
 }
 
 // Восстановление состояния помидоро

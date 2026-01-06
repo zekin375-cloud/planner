@@ -5,76 +5,16 @@ import { setApiServerUrl, getApiBaseUrl } from './config.js';
 // Показать модальное окно настроек сервера
 export function showServerSettings() {
     const modal = document.getElementById('serverSettingsModal');
-    if (!modal) {
-        createServerSettingsModal();
-    }
-    
-    const modalElement = document.getElementById('serverSettingsModal');
     const input = document.getElementById('serverUrlInput');
     
-    if (modalElement && input) {
+    if (modal && input) {
         // Заполняем текущий URL
-        input.value = getApiBaseUrl();
-        modalElement.classList.add('show');
+        input.value = getApiBaseUrl() || '';
+        modal.classList.add('show');
         input.focus();
+    } else {
+        console.error('Модальное окно настроек сервера не найдено');
     }
-}
-
-// Создание модального окна настроек
-function createServerSettingsModal() {
-    const modal = document.createElement('div');
-    modal.id = 'serverSettingsModal';
-    modal.className = 'modal';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>⚙️ Настройки сервера</h3>
-                <button class="modal-close" id="closeServerSettingsModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p class="pincode-description">
-                    Введите IP адрес и порт сервера, на котором запущен Flask.
-                    <br>Например: http://192.168.1.100:5000
-                </p>
-                <div class="form-group">
-                    <label>URL сервера</label>
-                    <input 
-                        type="text" 
-                        id="serverUrlInput" 
-                        class="modal-input" 
-                        placeholder="http://192.168.1.100:5000"
-                        autocomplete="off"
-                    >
-                    <div class="pincode-error" id="serverUrlError" style="display: none;"></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" id="cancelServerSettingsBtn">Отмена</button>
-                <button class="btn-primary" id="saveServerSettingsBtn">Сохранить</button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Обработчики событий
-    document.getElementById('closeServerSettingsModal').addEventListener('click', hideServerSettings);
-    document.getElementById('cancelServerSettingsBtn').addEventListener('click', hideServerSettings);
-    document.getElementById('saveServerSettingsBtn').addEventListener('click', saveServerSettings);
-    
-    // Закрытие по клику вне модального окна
-    modal.addEventListener('click', (e) => {
-        if (e.target.id === 'serverSettingsModal') {
-            hideServerSettings();
-        }
-    });
-    
-    // Enter для сохранения
-    document.getElementById('serverUrlInput').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            saveServerSettings();
-        }
-    });
 }
 
 // Скрыть модальное окно настроек
@@ -128,4 +68,41 @@ function saveServerSettings() {
     window.location.reload();
 }
 
-
+// Инициализация обработчиков событий
+document.addEventListener('DOMContentLoaded', () => {
+    const closeBtn = document.getElementById('closeServerSettingsModal');
+    const cancelBtn = document.getElementById('cancelServerSettingsBtn');
+    const saveBtn = document.getElementById('saveServerSettingsBtn');
+    const modal = document.getElementById('serverSettingsModal');
+    const input = document.getElementById('serverUrlInput');
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', hideServerSettings);
+    }
+    
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', hideServerSettings);
+    }
+    
+    if (saveBtn) {
+        saveBtn.addEventListener('click', saveServerSettings);
+    }
+    
+    // Закрытие по клику вне модального окна
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target.id === 'serverSettingsModal') {
+                hideServerSettings();
+            }
+        });
+    }
+    
+    // Enter для сохранения
+    if (input) {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                saveServerSettings();
+            }
+        });
+    }
+});

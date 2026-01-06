@@ -38,6 +38,32 @@ def server_info():
         'url': f'http://{local_ip}:5000'
     })
 
+@app.route('/api/app-version')
+def app_version():
+    """Версия приложения для проверки обновлений"""
+    import os
+    import json
+    from datetime import datetime
+    
+    # Читаем версию из package.json
+    version = "1.0.0"
+    build_time = datetime.now().isoformat()
+    
+    try:
+        package_path = os.path.join(os.path.dirname(__file__), 'package.json')
+        if os.path.exists(package_path):
+            with open(package_path, 'r', encoding='utf-8') as f:
+                package_data = json.load(f)
+                version = package_data.get('version', '1.0.0')
+    except:
+        pass
+    
+    return jsonify({
+        'version': version,
+        'buildTime': build_time,
+        'timestamp': int(datetime.now().timestamp() * 1000)
+    })
+
 # API для проектов
 @app.route('/api/projects', methods=['GET'])
 def get_projects():
