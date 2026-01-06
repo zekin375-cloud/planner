@@ -21,6 +21,14 @@ if (fs.existsSync(templatesDir)) {
     copyRecursiveSync(templatesDir, distTemplatesDir);
 }
 
+// Копируем index.html в корень dist (требуется для Capacitor)
+const indexHtmlSrc = path.join(templatesDir, 'index.html');
+const indexHtmlDest = path.join(distDir, 'index.html');
+if (fs.existsSync(indexHtmlSrc)) {
+    fs.copyFileSync(indexHtmlSrc, indexHtmlDest);
+    console.log('index.html copied to dist/');
+}
+
 // Копируем database.py и app.py для локального запуска
 const filesToCopy = ['database.py', 'app.py', 'requirements.txt'];
 filesToCopy.forEach(file => {
