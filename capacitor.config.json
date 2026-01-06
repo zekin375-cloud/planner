@@ -3,10 +3,7 @@
   "appName": "Планировщик",
   "webDir": "dist",
   "server": {
-    "androidScheme": "http",
-    "hostname": "localhost",
-    "port": 5000,
-    "url": "http://localhost:5000"
+    "androidScheme": "https"
   },
   "android": {
     "allowMixedContent": true,

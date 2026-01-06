@@ -28,13 +28,33 @@ import('./daily-notes.js').then(module => {
 });
 
 // Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', () => {
-    loadProjects();
+document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
     // Инициализируем защиту пинкодом при неактивности
     initIdleProtection();
     // Инициализируем мобильный интерфейс
     initMobileUI();
+    
+    // Проверяем, настроен ли сервер перед загрузкой данных
+    try {
+        const { getApiBaseUrl } = await import('./config.js');
+        const apiUrl = getApiBaseUrl();
+        if (apiUrl) {
+            // Сервер настроен, загружаем проекты
+            loadProjects();
+        } else {
+            // Сервер не настроен, показываем сообщение
+            console.info('Сервер не настроен. Используйте настройки для указания IP адреса сервера.');
+            const projectsList = document.getElementById('projectsList');
+            if (projectsList) {
+                projectsList.innerHTML = '<div class="empty-state"><p>Сервер не настроен. Перейдите в настройки и укажите IP адрес сервера.</p></div>';
+            }
+        }
+    } catch (error) {
+        console.error('Ошибка проверки конфигурации:', error);
+        // Пытаемся загрузить проекты в любом случае (для браузера)
+        loadProjects();
+    }
 });
 
 // Настройка обработчиков событий
