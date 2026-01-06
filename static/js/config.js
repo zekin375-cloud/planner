@@ -23,9 +23,9 @@ export function getApiBaseUrl() {
             return API_BASE_URL;
         }
         
-        // По умолчанию используем localhost (для разработки)
-        // В продакшене нужно будет указать IP сервера
-        API_BASE_URL = 'http://localhost:5000';
+        // По умолчанию не устанавливаем URL
+        // Пользователь должен настроить IP адрес сервера через настройки
+        API_BASE_URL = '';
     } else {
         // В браузере используем текущий origin
         API_BASE_URL = window.location.origin;
@@ -45,6 +45,12 @@ export function setApiServerUrl(url) {
 // Получение полного URL для API запроса
 export function getApiUrl(path) {
     const baseUrl = getApiBaseUrl();
+    
+    // Если URL не настроен, выбрасываем понятную ошибку
+    if (!baseUrl) {
+        throw new Error('API сервер не настроен. Пожалуйста, укажите IP адрес сервера в настройках приложения.');
+    }
+    
     // Убираем начальный слэш из path если есть
     const cleanPath = path.startsWith('/') ? path.substring(1) : path;
     return `${baseUrl}/${cleanPath}`;
@@ -62,24 +68,15 @@ async function initConfig() {
                 return;
             }
             
-            // Пытаемся получить информацию о сервере автоматически
-            // (работает только если сервер доступен на localhost)
-            try {
-                const response = await fetch('http://localhost:5000/api/server-info');
-                if (response.ok) {
-                    const info = await response.json();
-                    setApiServerUrl(info.url);
-                    console.log('Автоматически определен URL сервера:', info.url);
-                }
-            } catch (e) {
-                // Сервер недоступен, используем localhost по умолчанию
-                // Пользователь должен будет настроить URL вручную
-                console.warn('Сервер недоступен. Используйте настройки для указания IP адреса сервера.');
-                API_BASE_URL = 'http://localhost:5000';
-            }
+            // НЕ пытаемся автоматически подключиться к localhost
+            // Пользователь должен настроить URL сервера вручную через настройки
+            // Не устанавливаем API_BASE_URL, чтобы приложение показало ошибку
+            // и пользователь понял, что нужно настроить сервер
+            console.info('URL сервера не настроен. Используйте настройки приложения для указания IP адреса сервера.');
+            API_BASE_URL = ''; // Пустой URL - пользователь должен настроить
         } catch (error) {
             console.warn('Ошибка инициализации конфига:', error);
-            API_BASE_URL = 'http://localhost:5000';
+            API_BASE_URL = ''; // Пустой URL
         }
     }
 }
