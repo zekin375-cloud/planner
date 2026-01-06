@@ -351,9 +351,16 @@ body {
     overflow: hidden;
 }
 
-.projects-panel.collapsed {
-    width: 60px;
-}
+    .projects-panel.collapsed {
+        width: 60px;
+    }
+    
+    /* На мобильных устройствах панель всегда на всю ширину */
+    @media (max-width: 768px) {
+        .projects-panel.collapsed {
+            width: 100%;
+        }
+    }
 
 .projects-panel.collapsed .projects-list {
     display: flex;
@@ -2814,7 +2821,23 @@ body.locked #pincodeModal .modal-content {
     }
     
     .projects-panel {
-        width: 100%;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    /* Улучшаем отступы для мобильных */
+    .projects-panel .panel-header {
+        padding: 16px;
+    }
+    
+    .projects-panel .projects-list {
+        padding: 8px;
+    }
+    
+    .projects-panel .project-item {
+        padding: 14px 16px;
+        font-size: 16px;
+        min-height: 52px;
     }
     
     .section-header h2 {
