@@ -53,6 +53,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Инициализируем уведомления для Capacitor
     await initNotifications();
     
+    // Инициализируем роутер для восстановления состояния из URL
+    const { initRouter } = await import('./router.js');
+    initRouter();
+    
     // Проверяем, настроен ли сервер перед загрузкой данных
     try {
         const { getApiBaseUrl } = await import('./config.js');
@@ -61,6 +65,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Сервер настроен, загружаем проекты
             try {
                 await loadProjects();
+                // После загрузки проектов роутер восстановит состояние из URL
+                // Если в URL нет параметров, будет выбран проект по умолчанию
             } catch (error) {
                 console.error('Ошибка загрузки проектов:', error);
                 const projectsList = document.getElementById('projectsList');

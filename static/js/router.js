@@ -47,11 +47,22 @@ async function restoreStateFromParams(params) {
         // Восстанавливаем выбранный проект (если не null)
         if (params.project !== null) {
             const { selectProject } = await import('./projects.js');
+            // Убеждаемся, что проекты загружены перед выбором
+            const { loadProjects } = await import('./projects.js');
+            try {
+                await loadProjects();
+            } catch (e) {
+                console.warn('Проекты уже загружены или ошибка загрузки:', e);
+            }
             await selectProject(params.project);
         } else {
             // По умолчанию открываем "Все задачи" (project_id = 0)
-            const { selectProject } = await import('./projects.js');
-            await selectProject(0);
+            // Но только если проекты уже загружены
+            const { currentProjectId } = await import('./state.js');
+            if (currentProjectId === null) {
+                const { selectProject } = await import('./projects.js');
+                await selectProject(0);
+            }
         }
         
         // Восстанавливаем календарь

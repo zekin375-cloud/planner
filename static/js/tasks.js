@@ -4,13 +4,18 @@ import { escapeHtml } from './utils.js';
 import { currentProjectId, selectedTaskId, setSelectedTaskId, showCompletedTasks, setShowCompletedTasks, isSearchMode, setIsSearchMode, currentTaskId, setCurrentTaskId } from './state.js';
 import { getActiveTaskId, timerStartTime, startTimerDisplay, updateTimerUI, updateTimerDisplay, stopTaskTimer } from './timer.js';
 import { showMainNotes } from './notes.js';
+import { apiGet, apiPost, apiPut, apiDelete } from './api.js';
 
 // Загрузка задач
 export async function loadTasks() {
     // Разрешаем загрузку если currentProjectId === 0 (Все задачи) или есть режим поиска
-    if (currentProjectId === null && !isSearchMode) return;
+    if (currentProjectId === null && !isSearchMode) {
+        console.log('loadTasks: пропущено, currentProjectId = null, isSearchMode =', isSearchMode);
+        return;
+    }
     
     try {
+        console.log('loadTasks: начинаем загрузку для проекта', currentProjectId);
         let tasks = [];
         if (isSearchMode) {
             const query = document.getElementById('searchInput').value.trim();
@@ -21,14 +26,18 @@ export async function loadTasks() {
                 }
                 return;
             }
-            const response = await fetch(`/api/search/tasks?q=${encodeURIComponent(query)}`);
-            tasks = await response.json();
+            tasks = await apiGet(`api/search/tasks?q=${encodeURIComponent(query)}`);
         } else {
-            const response = await fetch(`/api/projects/${currentProjectId}/tasks?include_completed=${showCompletedTasks}`);
-            tasks = await response.json();
+            tasks = await apiGet(`api/projects/${currentProjectId}/tasks?include_completed=${showCompletedTasks}`);
         }
         
+        console.log('loadTasks: получено задач', tasks.length);
+        
         const container = document.getElementById('tasksContainer');
+        if (!container) {
+            console.error('loadTasks: контейнер tasksContainer не найден');
+            return;
+        }
         
         if (tasks.length === 0) {
             if (currentProjectId === 0) {
@@ -45,8 +54,14 @@ export async function loadTasks() {
             const projectName = (currentProjectId === 0 && task.project_name) ? task.project_name : null;
             container.appendChild(createTaskElement(task, projectName));
         });
+        
+        console.log('loadTasks: задачи успешно загружены и отображены');
     } catch (error) {
         console.error('Ошибка загрузки задач:', error);
+        const container = document.getElementById('tasksContainer');
+        if (container) {
+            container.innerHTML = `<div class="empty-state"><p style="color: var(--danger);">Ошибка загрузки задач: ${error.message || 'Неизвестная ошибка'}</p></div>`;
+        }
     }
 }
 
@@ -170,8 +185,7 @@ export async function addTask() {
 // Показать модальное окно выбора проекта
 async function showSelectProjectModal() {
     try {
-        const projectsResponse = await fetch('/api/projects');
-        const projects = await projectsResponse.json();
+        const projects = await apiGet('api/projects');
         
         if (projects.length === 0) {
             alert('Нет доступных проектов. Создайте проект сначала.');
@@ -218,20 +232,12 @@ async function createTaskInProject(projectId, title) {
     const input = document.getElementById('taskInput');
     
     try {
-        const response = await fetch(`/api/projects/${projectId}/tasks`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ title })
-        });
+        await apiPost(`api/projects/${projectId}/tasks`, { title });
         
-        if (response.ok) {
-            if (input) {
-                input.value = '';
-            }
-            loadTasks();
+        if (input) {
+            input.value = '';
         }
+        await loadTasks();
     } catch (error) {
         console.error('Ошибка создания задачи:', error);
         alert('Ошибка при создании задачи');
@@ -262,13 +268,7 @@ export async function toggleTask(taskId, completed, event) {
     }
     
     try {
-        await fetch(`/api/tasks/${taskId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ completed })
-        });
+        await apiPut(`api/tasks/${taskId}`, { completed });
         
         // Если показываем завершенные, перезагружаем список
         if (showCompletedTasks) {
@@ -311,19 +311,17 @@ export async function editTask(taskId, event) {
         let task = null;
         if (isSearchMode) {
             const query = document.getElementById('searchInput').value.trim();
-            const response = await fetch(`/api/search/tasks?q=${encodeURIComponent(query)}`);
-            tasks = await response.json();
+            tasks = await apiGet(`api/search/tasks?q=${encodeURIComponent(query)}`);
             task = tasks.find(t => t.id === taskId);
             // Если редактируем из поиска, переключаемся на проект задачи
             if (task && task.project_id && task.project_id !== currentProjectId) {
                 await selectProject(task.project_id);
                 // Перезагружаем задачи проекта
-                const projectTasks = await fetch(`/api/projects/${task.project_id}/tasks`).then(r => r.json());
+                const projectTasks = await apiGet(`api/projects/${task.project_id}/tasks`);
                 task = projectTasks.find(t => t.id === taskId) || task;
             }
         } else {
-            const response = await fetch(`/api/projects/${currentProjectId}/tasks?include_completed=${showCompletedTasks}`);
-            tasks = await response.json();
+            const tasks = await apiGet(`api/projects/${currentProjectId}/tasks?include_completed=${showCompletedTasks}`);
             task = tasks.find(t => t.id === taskId);
         }
         
@@ -355,28 +353,20 @@ export async function saveTask() {
     }
     
     try {
-        const response = await fetch(`/api/tasks/${currentTaskId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ title, price })
-        });
+        await apiPut(`api/tasks/${currentTaskId}`, { title, price });
         
-        if (response.ok) {
-            hideTaskModal();
-            await loadTasks();
-            
-            // Обновляем статистику, если открыт проект "Все задачи"
-            if (currentProjectId === 0) {
-                const { loadStatistics } = await import('./statistics.js');
-                await loadStatistics();
-            }
-            
-            // Обновляем счетчики задач в проектах
-            const { updateProjectTaskCounts } = await import('./projects.js');
-            await updateProjectTaskCounts();
+        hideTaskModal();
+        await loadTasks();
+        
+        // Обновляем статистику, если открыт проект "Все задачи"
+        if (currentProjectId === 0) {
+            const { loadStatistics } = await import('./statistics.js');
+            await loadStatistics();
         }
+        
+        // Обновляем счетчики задач в проектах
+        const { updateProjectTaskCounts } = await import('./projects.js');
+        await updateProjectTaskCounts();
     } catch (error) {
         console.error('Ошибка сохранения задачи:', error);
         alert('Ошибка при сохранении задачи');
@@ -389,16 +379,12 @@ export async function deleteTask(taskId, event) {
     if (!confirm('Удалить задачу?')) return;
     
     try {
-        const response = await fetch(`/api/tasks/${taskId}`, {
-            method: 'DELETE'
-        });
+        await apiDelete(`api/tasks/${taskId}`);
         
-        if (response.ok) {
-            if (selectedTaskId === taskId) {
-                closeTaskDescription();
-            }
-            loadTasks();
+        if (selectedTaskId === taskId) {
+            closeTaskDescription();
         }
+        await loadTasks();
     } catch (error) {
         console.error('Ошибка удаления задачи:', error);
         alert('Ошибка при удалении задачи');
@@ -445,8 +431,7 @@ export async function selectTaskForDescription(taskId) {
     
     // Загружаем данные задачи для отображения срока
     try {
-        const response = await fetch(`/api/projects/${currentProjectId}/tasks?include_completed=true`);
-        const tasks = await response.json();
+        const tasks = await apiGet(`api/projects/${currentProjectId}/tasks?include_completed=true`);
         const task = tasks.find(t => t.id === taskId);
         
         if (task) {
@@ -602,20 +587,13 @@ export async function saveTaskDeadline() {
     const deadline = deadlineInput.value || null;
     
     try {
-        await fetch(`/api/tasks/${selectedTaskId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ deadline })
-        });
+        await apiPut(`api/tasks/${selectedTaskId}`, { deadline });
         
         // Обновляем список задач для отображения бейджа
-        loadTasks();
+        await loadTasks();
         
         // Обновляем отображение пинкода в заголовке и секции дедлайна
-        const response = await fetch(`/api/projects/${currentProjectId}/tasks?include_completed=true`);
-        const tasks = await response.json();
+        const tasks = await apiGet(`api/projects/${currentProjectId}/tasks?include_completed=true`);
         const task = tasks.find(t => t.id === selectedTaskId);
         
         if (task) {
@@ -637,20 +615,13 @@ export async function clearTaskDeadline() {
     document.getElementById('taskDeadlineInput').value = '';
     
     try {
-        await fetch(`/api/tasks/${selectedTaskId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ deadline: null })
-        });
+        await apiPut(`api/tasks/${selectedTaskId}`, { deadline: null });
         
         // Обновляем список задач
-        loadTasks();
+        await loadTasks();
         
         // Обновляем отображение пинкода в заголовке и секции дедлайна
-        const response = await fetch(`/api/projects/${currentProjectId}/tasks?include_completed=true`);
-        const tasks = await response.json();
+        const tasks = await apiGet(`api/projects/${currentProjectId}/tasks?include_completed=true`);
         const task = tasks.find(t => t.id === selectedTaskId);
         
         if (task) {

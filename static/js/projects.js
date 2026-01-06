@@ -72,8 +72,13 @@ export async function loadProjects() {
         const allTasksItem = createProjectElement(allTasksProject);
         projectsFooterList.appendChild(allTasksItem);
         
-        // Выбираем "Все задачи" по умолчанию
-        if (!currentProjectId) {
+        // Выбираем "Все задачи" по умолчанию только если нет параметров в URL
+        // Роутер сам восстановит состояние из URL если есть параметры
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectParam = urlParams.get('project');
+        
+        if (!currentProjectId && projectParam === null) {
+            // Нет проекта в состоянии и нет в URL - выбираем по умолчанию
             selectProject(0); // Выбираем "Все задачи" по умолчанию
         }
         

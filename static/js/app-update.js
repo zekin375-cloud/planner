@@ -28,16 +28,75 @@ function getLocalVersion() {
     return localStorage.getItem('app_version') || '1.0.0';
 }
 
+// Показать сообщение пользователю
+function showMessage(message, type = 'info') {
+    // Удаляем предыдущее сообщение если есть
+    const existingMsg = document.getElementById('updateCheckMessage');
+    if (existingMsg) {
+        existingMsg.remove();
+    }
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.id = 'updateCheckMessage';
+    messageDiv.className = 'update-check-message';
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: ${type === 'error' ? 'var(--danger)' : type === 'success' ? 'var(--success)' : 'var(--bg-secondary)'};
+        color: ${type === 'error' || type === 'success' ? 'white' : 'var(--text-primary)'};
+        border: 2px solid ${type === 'error' ? 'var(--danger)' : type === 'success' ? 'var(--success)' : 'var(--accent)'};
+        border-radius: 12px;
+        padding: 16px 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        z-index: 10001;
+        max-width: 90%;
+        text-align: center;
+        font-size: 14px;
+        animation: slideDown 0.3s ease-out;
+    `;
+    messageDiv.textContent = message;
+    
+    // Добавляем стили для анимации если их нет
+    if (!document.getElementById('updateCheckMessageStyles')) {
+        const style = document.createElement('style');
+        style.id = 'updateCheckMessageStyles';
+        style.textContent = `
+            @keyframes slideDown {
+                from {
+                    transform: translateX(-50%) translateY(-100px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(-50%) translateY(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(messageDiv);
+    
+    // Автоматически скрываем через 3 секунды
+    setTimeout(() => {
+        if (messageDiv) {
+            messageDiv.style.animation = 'slideDown 0.3s ease-out reverse';
+            setTimeout(() => messageDiv.remove(), 300);
+        }
+    }, 3000);
+}
+
 // Проверка обновлений
 export async function checkForUpdates(showNotification = true) {
-    if (!isCapacitor()) {
-        // В браузере просто перезагружаем страницу
-        return false;
-    }
+    // Показываем индикатор загрузки
+    showMessage('Проверка обновлений...', 'info');
     
     try {
         const serverVersion = await getServerVersion();
         if (!serverVersion) {
+            showMessage('Не удалось получить информацию о версии с сервера. Проверьте подключение к серверу.', 'error');
             return false;
         }
         
@@ -46,17 +105,27 @@ export async function checkForUpdates(showNotification = true) {
         
         // Сравниваем версии
         if (serverVersionStr !== localVersion) {
+            // Обновляем время последней проверки
+            saveLocalVersion(serverVersionStr);
             if (showNotification) {
+                // Скрываем сообщение о проверке
+                const checkMsg = document.getElementById('updateCheckMessage');
+                if (checkMsg) checkMsg.remove();
                 showUpdateAvailableNotification(serverVersionStr);
+            } else {
+                showMessage(`Доступна новая версия: ${serverVersionStr} (текущая: ${localVersion})`, 'info');
             }
             return true;
         }
         
         // Обновляем время последней проверки
         saveLocalVersion(serverVersionStr);
+        showMessage(`✓ У вас установлена последняя версия (${serverVersionStr})`, 'success');
         return false;
     } catch (error) {
         console.error('Ошибка проверки обновлений:', error);
+        const errorMsg = error.message || 'Неизвестная ошибка';
+        showMessage(`Ошибка проверки обновлений: ${errorMsg}`, 'error');
         return false;
     }
 }
