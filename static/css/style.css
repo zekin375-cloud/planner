@@ -1,0 +1,2926 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Хедер приложения */
+.app-header {
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 8px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.header-content > .header-logo,
+.header-content > .header-actions {
+    display: flex;
+    align-items: center;
+}
+
+.header-content > .header-actions {
+    justify-content: flex-end;
+}
+
+.header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.header-logo h1 {
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-start-workday {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-start-workday::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-start-workday:hover::before {
+    left: 100%;
+}
+
+.btn-start-workday:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.btn-start-workday:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+}
+
+.btn-start-workday.active {
+    background: linear-gradient(135deg, var(--danger) 0%, #d32f2f 100%);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.btn-start-workday.active:hover {
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.btn-icon {
+    font-size: 16px;
+}
+
+.btn-pincode-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 18px;
+}
+
+.btn-pincode-toggle:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+}
+
+.user-menu {
+    position: relative;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-hover) 100%);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-avatar:hover {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    border-color: var(--accent);
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+}
+
+.avatar-icon {
+    font-size: 16px;
+}
+
+.user-popup {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--shadow);
+    min-width: 200px;
+    padding: 12px;
+    z-index: 1000;
+}
+
+.popup-content {
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+/* Помидорный таймер */
+.pomodoro-timer {
+    background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.3s ease-out;
+    min-width: 200px;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pomodoro-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pomodoro-status {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    background: var(--bg-hover);
+    border-radius: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;
+}
+
+.pomodoro-time {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+    transition: all 0.3s;
+}
+
+.pomodoro-timer.work {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, var(--bg-secondary) 100%);
+    border-top-color: var(--accent);
+}
+
+.pomodoro-timer.work .pomodoro-status {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.pomodoro-timer.work .pomodoro-time {
+    color: var(--accent);
+    text-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.pomodoro-timer.break {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, var(--bg-secondary) 100%);
+    border-top-color: var(--success);
+}
+
+.pomodoro-timer.break .pomodoro-status {
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.pomodoro-timer.break .pomodoro-time {
+    color: var(--success);
+    text-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.pomodoro-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-pomodoro {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: var(--bg-hover);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-pomodoro:hover {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    color: white;
+    border-color: var(--accent);
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+}
+
+.btn-pomodoro:active {
+    transform: scale(0.95);
+}
+
+:root {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-tertiary: #3a3a3a;
+    --bg-hover: #404040;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --accent: #6366f1;
+    --accent-hover: #4f46e5;
+    --success: #10b981;
+    --danger: #ef4444;
+    --border: #404040;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --header-height: 60px;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-header {
+    flex-shrink: 0;
+}
+
+.container {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    gap: 1px;
+    background: var(--border);
+}
+
+/* Левая панель проектов */
+.projects-panel {
+    width: 280px;
+    background: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    transition: width 0.3s ease;
+    overflow: hidden;
+}
+
+.projects-panel.collapsed {
+    width: 60px;
+}
+
+.projects-panel.collapsed .projects-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 5px;
+    gap: 8px;
+}
+
+.projects-panel.collapsed .panel-header h2 {
+    display: none;
+}
+
+.panel-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 76px;
+}
+
+.projects-panel.collapsed .panel-header {
+    padding: 20px 12px;
+    justify-content: center;
+}
+
+.panel-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.panel-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.btn-add-project,
+.btn-toggle-panel,
+.btn-add-password {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 18px;
+    font-weight: 300;
+}
+
+.btn-add-project:hover,
+.btn-toggle-panel:hover,
+.btn-add-password:hover {
+    background: var(--accent-hover);
+    transform: scale(1.05);
+}
+
+.projects-panel.collapsed .btn-add-project {
+    display: none;
+}
+
+.projects-panel.collapsed .panel-header-actions {
+    justify-content: center;
+    width: 100%;
+}
+
+.projects-panel.collapsed .btn-toggle-panel {
+    width: 100%;
+}
+
+.projects-panel.collapsed .btn-toggle-panel .icon {
+    transform: rotate(180deg);
+}
+
+.projects-panel.collapsed .projects-footer {
+    padding: 10px 5px;
+}
+
+.projects-panel.collapsed .btn-passwords {
+    padding: 8px;
+    font-size: 12px;
+}
+
+.projects-panel.collapsed .btn-passwords::before {
+    content: '🔐';
+    font-size: 16px;
+}
+
+.projects-panel.collapsed .btn-passwords {
+    font-size: 0;
+}
+
+.projects-panel.collapsed .btn-passwords::after {
+    content: '';
+}
+
+.projects-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.projects-footer {
+    padding: 10px;
+    border-top: 1px solid var(--border);
+}
+
+.projects-footer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.projects-footer-list .project-item {
+    margin-bottom: 0;
+}
+
+.btn-passwords {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-passwords:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+}
+
+.btn-passwords.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.project-item {
+    padding: 12px 16px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    width: 100%;
+}
+
+.project-item .project-name {
+    flex: 1;
+    min-width: 0;
+}
+
+.project-item.draggable {
+    cursor: grab;
+}
+
+.project-item.draggable:active {
+    cursor: grabbing;
+}
+
+.project-item.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+}
+
+.project-item.drag-over {
+    border: 2px dashed var(--accent);
+    background: var(--bg-hover);
+}
+
+.project-item.drag-over-top::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+}
+
+.project-item.drag-over-bottom::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+}
+
+.projects-panel.collapsed .project-item {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    margin-bottom: 0;
+    justify-content: center;
+    border-radius: 8px;
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.projects-panel.collapsed .project-name,
+.projects-panel.collapsed .project-delete {
+    display: none;
+}
+
+.projects-panel.collapsed .project-item::before {
+    content: attr(data-initial);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.projects-panel.collapsed .project-item:hover::before {
+    background: var(--bg-hover);
+    transform: scale(1.1);
+}
+
+.projects-panel.collapsed .project-item.active::before {
+    color: white;
+    background: var(--accent);
+}
+
+.projects-panel.collapsed .project-item.active:hover::before {
+    background: var(--accent-hover);
+}
+
+.project-item:hover {
+    background: var(--bg-hover);
+}
+
+.project-item.active {
+    background: var(--accent);
+    color: white;
+}
+
+.project-item.active .project-delete {
+    opacity: 1;
+}
+
+.project-name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.project-task-count {
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    min-width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 0 6px;
+    flex-shrink: 0;
+}
+
+.project-delete {
+    opacity: 0;
+    transition: opacity 0.2s;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.project-delete:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Основная область */
+.main-content {
+    flex: 1;
+    display: flex;
+    gap: 1px;
+    background: var(--border);
+    overflow: hidden;
+}
+
+/* Секция задач */
+.tasks-section {
+    flex: 1;
+    background: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+}
+
+.notes-section {
+    flex: 1;
+    background: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+}
+
+.section-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.section-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-back-to-notes {
+    padding: 6px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-back-to-notes:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.search-container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px 32px 8px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.search-input:focus {
+    border-color: var(--accent);
+    background: var(--bg-hover);
+}
+
+.search-clear {
+    position: absolute;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.search-clear:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.section-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.save-indicator {
+    font-size: 12px;
+    color: var(--text-secondary);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.save-indicator.show {
+    opacity: 1;
+}
+
+.save-indicator.saving {
+    color: var(--accent);
+}
+
+/* Ввод задачи */
+.task-input-container {
+    padding: 20px;
+    display: flex;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* Скрытие поля ввода задач в режиме паролей */
+.is-password-mode .task-input-container {
+    display: none !important;
+}
+
+.task-input {
+    flex: 1;
+    padding: 12px 16px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.task-input:focus {
+    border-color: var(--accent);
+    background: var(--bg-hover);
+}
+
+.btn-add-task {
+    padding: 12px 24px;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-add-task:hover {
+    background: var(--accent-hover);
+}
+
+.btn-add-task .icon {
+    font-size: 18px;
+    font-weight: 300;
+}
+
+/* Контейнер задач */
+.tasks-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.task-item {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    opacity: 1;
+    transform: translateX(0);
+    max-height: 200px;
+    overflow: hidden;
+}
+
+.task-item.hiding {
+    opacity: 0;
+    transform: translateX(-100%);
+    max-height: 0;
+    padding: 0 16px;
+    margin-bottom: 0;
+    transition: all 0.5s ease;
+}
+
+.task-item:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+}
+
+.task-item.selected {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.task-item.selected .task-title {
+    color: white;
+}
+
+.task-item.selected .task-description {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.task-item.completed {
+    opacity: 0.6;
+}
+
+.task-checkbox {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    cursor: pointer;
+    accent-color: var(--accent);
+}
+
+.task-content {
+    flex: 1;
+}
+
+.task-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    word-break: break-word;
+}
+
+.task-item.completed .task-title {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+}
+
+.task-description {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    word-break: break-word;
+}
+
+.task-project-label {
+    font-size: 11px;
+    color: var(--accent);
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.task-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.task-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 16px;
+    opacity: 0;
+}
+
+.task-item:hover .task-btn {
+    opacity: 1;
+}
+
+.btn-edit {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.btn-edit:hover {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-delete {
+    background: var(--bg-hover);
+    color: var(--danger);
+}
+
+.btn-delete:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* Заметки */
+.notes-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.notes-textarea {
+    flex: 1;
+    padding: 20px;
+    background: var(--bg-tertiary);
+    border: none;
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.6;
+    resize: none;
+    outline: none;
+    font-family: inherit;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.notes-textarea:focus {
+    background: var(--bg-hover);
+}
+
+.notes-textarea:empty:before {
+    content: attr(data-placeholder);
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+.notes-textarea img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 10px 0;
+    display: block;
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+.notes-textarea img:hover {
+    opacity: 0.9;
+    cursor: pointer;
+}
+
+/* Описание задачи справа */
+.task-description-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background: var(--bg-tertiary);
+    overflow-y: auto;
+}
+
+.task-description-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border);
+}
+
+.task-description-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.btn-close-description {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: all 0.2s;
+}
+
+.btn-close-description:hover {
+    background: var(--danger);
+    color: white;
+}
+
+.task-description-content {
+    flex: 1;
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Модальные окна */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px var(--shadow);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 24px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-input,
+.modal-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.modal-input:focus,
+.modal-textarea:focus {
+    border-color: var(--accent);
+    background: var(--bg-hover);
+}
+
+.modal-textarea {
+    margin-top: 12px;
+    min-height: 100px;
+    resize: vertical;
+}
+
+.modal-footer {
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+}
+
+.btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-hover);
+}
+
+/* Скроллбар */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--bg-hover);
+}
+
+/* Срок выполнения задачи */
+.task-deadline-section {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-tertiary);
+}
+
+.deadline-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.deadline-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.deadline-input {
+    flex: 1;
+    padding: 8px 12px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.deadline-input:focus {
+    border-color: var(--accent);
+}
+
+.btn-clear-deadline {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-clear-deadline:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+}
+
+/* Таймер работы над задачей */
+.task-timer-section {
+    padding: 15px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-secondary);
+    margin-top: auto;
+}
+
+.timer-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding: 12px;
+    background: var(--bg-hover);
+    border-radius: 8px;
+}
+
+.timer-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.timer-value {
+    font-size: 24px;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+    color: var(--accent);
+    letter-spacing: 2px;
+}
+
+.task-timer-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-start-task,
+.btn-stop-task {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-start-task {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-start-task:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+.btn-stop-task {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-stop-task:hover {
+    background: #d32f2f;
+    transform: translateY(-1px);
+}
+
+/* Футер секции задач */
+.tasks-footer {
+    padding: 15px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+    background: var(--bg-secondary);
+}
+
+/* Кнопка показа завершенных */
+.btn-show-completed {
+    padding: 8px 16px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+    white-space: nowrap;
+    width: 100%;
+    max-width: 200px;
+}
+
+.btn-show-completed:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+}
+
+.btn-show-completed.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.section-header-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.task-deadline-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    margin-left: 8px;
+}
+
+.task-deadline-badge.overdue {
+    background: var(--danger);
+    color: white;
+}
+
+.task-deadline-badge.today {
+    background: var(--accent);
+    color: white;
+}
+
+.task-price-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--success);
+    color: white;
+    margin-left: 8px;
+    font-weight: 500;
+}
+
+/* Просмотр пароля */
+.password-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-tertiary);
+    overflow-y: auto;
+}
+
+.password-view-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.password-view-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.password-view-body {
+    flex: 1;
+    padding: 20px;
+}
+
+.password-view-item {
+    margin-bottom: 20px;
+}
+
+.password-view-item label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.password-view-value {
+    font-size: 14px;
+    color: var(--text-primary);
+    padding: 10px 12px;
+    background: var(--bg-hover);
+    border-radius: 6px;
+    word-break: break-word;
+    min-height: 20px;
+}
+
+.password-view-value.password-hidden {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+}
+
+.password-view-link {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.password-view-link:hover {
+    text-decoration: underline;
+}
+
+.password-view-password-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.password-view-password-group .password-view-value {
+    flex: 1;
+}
+
+.password-view-actions {
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.password-view-actions .btn-danger {
+    background: var(--danger);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.password-view-actions .btn-danger:hover {
+    background: #d32f2f;
+    transform: translateY(-1px);
+}
+
+/* Модальное окно пароля */
+.password-modal-content {
+    max-width: 900px;
+    width: 90%;
+}
+
+.password-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.password-form-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.password-modal-content .form-group {
+    margin-bottom: 0;
+}
+
+.password-modal-content .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.password-modal-content .form-input,
+.password-modal-content .form-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.password-modal-content .form-input:focus,
+.password-modal-content .form-textarea:focus {
+    border-color: var(--accent);
+    background: var(--bg-hover);
+}
+
+.password-modal-content .form-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.password-input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.password-input-group .form-input {
+    flex: 1;
+}
+
+.btn-show-password,
+.btn-copy-password {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-show-password:hover,
+.btn-copy-password:hover {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.password-strength-container {
+    margin-top: 8px;
+}
+
+.password-strength-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--bg-tertiary);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.password-strength-fill {
+    height: 100%;
+    width: 0%;
+    transition: all 0.3s;
+    border-radius: 2px;
+}
+
+.password-strength-fill.weak {
+    background: var(--danger);
+}
+
+.password-strength-fill.medium {
+    background: #ff9800;
+}
+
+.password-strength-fill.strong {
+    background: var(--success);
+}
+
+.password-strength-text {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.password-strength-text.weak {
+    color: var(--danger);
+}
+
+.password-strength-text.medium {
+    color: #ff9800;
+}
+
+.password-strength-text.strong {
+    color: var(--success);
+}
+
+.btn-generate-password {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-generate-password:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+}
+
+@media (max-width: 768px) {
+    .password-form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .password-modal-content {
+        max-width: 600px;
+    }
+}
+
+/* Статистика */
+.statistics-container {
+    padding: 20px;
+}
+
+.statistics-header {
+    margin-bottom: 20px;
+}
+
+.statistics-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.statistics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.statistics-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.statistics-card:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.statistics-card.completed {
+    border-color: var(--success);
+}
+
+.statistics-card.remaining {
+    border-color: var(--accent);
+}
+
+.statistics-card.time {
+    border-color: #ff9800;
+}
+
+.statistics-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.statistics-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.statistics-card.completed .statistics-value {
+    color: var(--success);
+}
+
+.statistics-card.remaining .statistics-value {
+    color: var(--accent);
+}
+
+.statistics-card.time .statistics-value {
+    color: #ff9800;
+}
+
+.statistics-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .statistics-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Страница статистики */
+.user-menu-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.user-menu-item:hover {
+    background: var(--bg-hover);
+}
+
+.stats-menu {
+    padding: 10px;
+    border-top: 1px solid var(--border);
+}
+
+.stats-menu-item {
+    padding: 10px 12px;
+    margin-bottom: 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.stats-menu-item:hover {
+    background: var(--bg-hover);
+}
+
+.stats-menu-item.active {
+    background: var(--accent);
+    color: white;
+}
+
+.stats-main-content {
+    padding: 20px;
+    width: 100%;
+}
+
+.stats-page {
+    width: 100%;
+}
+
+.stats-header {
+    margin-bottom: 30px;
+}
+
+.stats-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+}
+
+.stats-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.stats-summary-item {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+}
+
+.stats-summary-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 8px;
+}
+
+.stats-summary-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.stats-charts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+.stats-chart-container {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.stats-chart-container h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+}
+
+.stats-chart-container canvas {
+    max-height: 300px;
+}
+
+.project-stats-list {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.project-stats-item {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-stats-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.project-stats-details {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.project-stats-details span {
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .stats-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .project-stats-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .project-stats-details {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+/* Улучшенный дизайн списка паролей */
+.password-item {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.password-item:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+    transform: translateX(4px);
+}
+
+.password-item.selected {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.password-item-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.password-item.selected .password-item-name {
+    color: white;
+}
+
+.password-item-project {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    font-style: italic;
+}
+
+.password-item.selected .password-item-project {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.password-item-username {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.password-item.selected .password-item-username {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.password-item-url {
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.password-item.selected .password-item-url {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.password-item-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.password-item-type {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.password-item.selected .password-item-type {
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.password-modal-content select.form-input {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 35px;
+}
+
+.password-item-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.password-item-type {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.password-item.selected .password-item-type {
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.password-modal-content select.form-input {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 35px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .projects-panel {
+        width: 100%;
+        height: 200px;
+    }
+    
+    .main-content {
+        flex-direction: column;
+    }
+}
+
+/* Список проектов для выбора в модальном окне */
+.projects-select-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.project-select-item {
+    padding: 16px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.project-select-item:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+    transform: translateX(4px);
+}
+
+.project-select-item:active {
+    transform: translateX(2px);
+}
+
+.project-select-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* Календарь */
+.calendar-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.btn-calendar-nav {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-calendar-nav:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    margin-bottom: 20px;
+}
+
+.calendar-day-header {
+    padding: 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    padding: 4px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.2s;
+    font-size: 12px;
+    min-height: 32px;
+}
+
+.calendar-day:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+}
+
+.calendar-day.today {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.calendar-day.selected {
+    background: var(--accent-hover);
+    border-color: var(--accent);
+    color: white;
+}
+
+.calendar-day.has-events {
+    border-color: var(--accent);
+}
+
+.calendar-day.has-events .event-count {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.calendar-day.empty {
+    background: transparent;
+    border: none;
+    cursor: default;
+}
+
+.calendar-events {
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+}
+
+.calendar-events h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.calendar-events-list {
+    margin-bottom: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.calendar-event-item {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.calendar-event-item:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+}
+
+.event-time {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.event-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.event-description {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.event-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: all 0.2s;
+}
+
+.calendar-event-item:hover .event-actions {
+    opacity: 1;
+}
+
+.event-edit,
+.event-delete {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.event-edit:hover {
+    background: var(--accent);
+    color: white;
+}
+
+.event-delete:hover {
+    background: var(--danger);
+    color: white;
+}
+
+.no-events {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 20px;
+    font-size: 14px;
+}
+
+.btn-add-event {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-add-event:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+}
+
+.btn-calendar {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-calendar:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+}
+
+.btn-back-to-daily {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-back-to-daily:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+}
+
+/* Модальное окно пинкода */
+.pincode-modal-content {
+    max-width: 400px;
+}
+
+.pincode-description {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 20px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.pincode-inputs-container {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.pincode-digit-input {
+    width: 60px;
+    height: 70px;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    outline: none;
+    transition: all 0.2s;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0;
+}
+
+/* Скрываем символы пароля, показываем только точку */
+.pincode-digit-input[type="password"] {
+    -webkit-text-security: disc;
+    font-size: 24px;
+    letter-spacing: 0;
+}
+
+@media (max-width: 480px) {
+    .pincode-digit-input {
+        width: 50px;
+        height: 60px;
+        font-size: 28px;
+    }
+    
+    .pincode-inputs-container {
+        gap: 8px;
+    }
+}
+
+.pincode-digit-input:focus {
+    border-color: var(--accent);
+    background: var(--bg-hover);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    transform: scale(1.05);
+}
+
+.pincode-digit-input.error {
+    border-color: var(--danger);
+    background: rgba(239, 68, 68, 0.1);
+    animation: shake 0.3s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.pincode-error {
+    margin-top: 12px;
+    color: var(--danger);
+    font-size: 13px;
+    text-align: center;
+    min-height: 20px;
+}
+
+/* Блокировка интерфейса при запросе пинкода */
+body.locked {
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Скрываем весь контент сайта, кроме модального окна пинкода */
+body.locked > *:not(#pincodeModal) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+body.locked .app-header,
+body.locked .container,
+body.locked .projects-panel,
+body.locked .main-content,
+body.locked .tasks-section,
+body.locked .notes-section {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+body.locked #pincodeModal {
+    pointer-events: auto;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 99999 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+body.locked #pincodeModal .modal-content {
+    pointer-events: auto;
+}
+
+/* Увеличиваем затемнение фона для модального окна пинкода */
+#pincodeModal {
+    background: rgba(0, 0, 0, 1) !important;
+    backdrop-filter: blur(10px);
+}
+
+#pincodeModal.show {
+    background: rgba(0, 0, 0, 1) !important;
+}
+
+/* ============================================
+   АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ
+   ============================================ */
+
+/* Общие стили для мобильных */
+@media (max-width: 768px) {
+    /* Улучшаем touch-интерфейс */
+    * {
+        -webkit-tap-highlight-color: rgba(99, 102, 241, 0.2);
+        touch-action: manipulation;
+    }
+    
+    /* Хедер - компактнее */
+    .app-header {
+        padding: 8px 12px;
+    }
+    
+    .header-logo h1 {
+        font-size: 16px;
+    }
+    
+    .header-actions {
+        gap: 6px;
+    }
+    
+    .btn-start-workday {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .btn-start-workday .btn-text {
+        display: none;
+    }
+    
+    .btn-pincode-toggle,
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+    }
+    
+    /* Контейнер - вертикальная компоновка на мобильных */
+    .container {
+        flex-direction: column;
+    }
+    
+    /* Панель проектов - скрывается по умолчанию, показывается как overlay */
+    .projects-panel {
+        position: fixed;
+        left: -100%;
+        top: 0;
+        bottom: 0;
+        width: 280px;
+        z-index: 1000;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .projects-panel.show {
+        left: 0;
+    }
+    
+    .projects-panel.collapsed {
+        width: 280px;
+    }
+    
+    /* Кнопка открытия панели в хедере на мобильных */
+    .btn-open-projects {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: var(--bg-tertiary);
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-open-projects:hover {
+        background: var(--bg-hover);
+        border-color: var(--accent);
+    }
+    
+    /* Overlay для закрытия панели */
+    .projects-panel-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+    
+    .projects-panel.show ~ .projects-panel-overlay {
+        display: block;
+    }
+    
+    /* Основной контент - на всю ширину */
+    .main-content {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    /* Секции задач и заметок - вертикально */
+    .tasks-section,
+    .notes-section {
+        width: 100%;
+        height: 50vh;
+        min-height: 300px;
+    }
+    
+    /* Заголовки секций */
+    .section-header {
+        padding: 12px;
+    }
+    
+    .section-header h2 {
+        font-size: 18px;
+    }
+    
+    /* Поле ввода задачи */
+    .task-input-container {
+        padding: 10px 12px;
+    }
+    
+    .task-input {
+        font-size: 16px; /* Предотвращает zoom на iOS */
+        padding: 12px;
+    }
+    
+    /* Контейнер задач */
+    .tasks-container {
+        padding: 8px;
+    }
+    
+    /* Элементы задач - больше для touch */
+    .task-item {
+        padding: 14px 12px;
+        margin-bottom: 8px;
+        min-height: 56px; /* Минимальный размер для touch */
+    }
+    
+    .task-checkbox {
+        width: 24px;
+        height: 24px;
+        margin-right: 12px;
+    }
+    
+    .task-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+    
+    /* Кнопки */
+    .btn-add-task,
+    .btn-add-project {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+    }
+    
+    /* Модальные окна - на всю ширину с отступами */
+    .modal-content {
+        width: calc(100% - 32px);
+        max-width: 100%;
+        margin: 16px;
+        max-height: calc(100vh - 32px);
+        overflow-y: auto;
+    }
+    
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding: 16px;
+    }
+    
+    /* Формы в модальных окнах */
+    .modal-input,
+    .modal-textarea {
+        font-size: 16px; /* Предотвращает zoom на iOS */
+        padding: 12px;
+    }
+    
+    /* Кнопки в модальных окнах */
+    .btn-primary,
+    .btn-secondary {
+        padding: 12px 20px;
+        font-size: 15px;
+        min-height: 44px; /* Минимальный размер для touch */
+    }
+    
+    /* Панель заметок */
+    .notes-textarea {
+        padding: 12px;
+        font-size: 16px; /* Предотвращает zoom на iOS */
+        min-height: 200px;
+    }
+    
+    /* Footer задач */
+    .tasks-footer {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+    
+    .btn-show-completed,
+    .btn-calendar,
+    .btn-back-to-daily {
+        padding: 10px 14px;
+        font-size: 14px;
+        min-height: 44px;
+    }
+    
+    /* Поиск */
+    .search-container {
+        padding: 0 12px;
+    }
+    
+    .search-input {
+        font-size: 16px; /* Предотвращает zoom на iOS */
+        padding: 10px 12px;
+    }
+    
+    /* Статистика - одна колонка */
+    .statistics-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .statistics-card {
+        padding: 16px;
+    }
+    
+    /* Пароли */
+    .password-item {
+        padding: 14px 12px;
+        min-height: 60px;
+    }
+    
+    /* Календарь */
+    .calendar-grid {
+        gap: 4px;
+        padding: 8px;
+    }
+    
+    .calendar-day {
+        min-height: 40px;
+        font-size: 13px;
+    }
+}
+
+/* Малые экраны (до 480px) */
+@media (max-width: 480px) {
+    .header-logo h1 {
+        font-size: 14px;
+    }
+    
+    .projects-panel {
+        width: 100%;
+    }
+    
+    .section-header h2 {
+        font-size: 16px;
+    }
+    
+    .task-item {
+        padding: 12px 10px;
+    }
+    
+    .modal-content {
+        width: calc(100% - 24px);
+        margin: 12px;
+        border-radius: 8px;
+    }
+    
+    .modal-header h3 {
+        font-size: 18px;
+    }
+    
+    .statistics-value {
+        font-size: 28px;
+    }
+    
+    .statistics-icon {
+        font-size: 24px;
+    }
+}
+
+/* Портретная ориентация */
+@media (max-width: 768px) and (orientation: portrait) {
+    .tasks-section,
+    .notes-section {
+        height: 50vh;
+    }
+}
+
+/* Альбомная ориентация */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .tasks-section,
+    .notes-section {
+        height: 100vh;
+    }
+}
+
+/* Улучшения для touch-устройств */
+@media (hover: none) and (pointer: coarse) {
+    /* Увеличиваем области клика */
+    .task-item,
+    .project-item,
+    .password-item {
+        min-height: 48px;
+    }
+    
+    /* Убираем hover эффекты, заменяем на active */
+    .task-item:hover,
+    .project-item:hover {
+        background: var(--bg-hover);
+    }
+    
+    .task-item:active,
+    .project-item:active {
+        background: var(--bg-tertiary);
+        transform: scale(0.98);
+    }
+    
+    /* Кнопки больше */
+    button {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Улучшаем скролл */
+    .tasks-container,
+    .projects-list,
+    .notes-textarea {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+}
+
+/* Безопасная зона для устройств с вырезами (notch) */
+@supports (padding: max(0px)) {
+    .app-header {
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+    }
+    
+    .container {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+/* Улучшения для iOS */
+@supports (-webkit-touch-callout: none) {
+    .task-input,
+    .search-input,
+    .modal-input,
+    .notes-textarea {
+        font-size: 16px; /* Предотвращает автоматический zoom */
+    }
+    
+    /* Улучшаем скролл на iOS */
+    .tasks-container,
+    .projects-list {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+

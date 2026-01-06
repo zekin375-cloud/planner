@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Планировщик</string>
+    <string name="title_activity_main">Планировщик</string>
+    <string name="package_name">com.planner.app</string>
+    <string name="custom_url_scheme">com.planner.app</string>
+</resources>

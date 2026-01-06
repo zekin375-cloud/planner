@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проверка подключения к серверу</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .status {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #10b981;
+            color: white;
+        }
+        .error {
+            background: #ef4444;
+            color: white;
+        }
+        .info {
+            background: #3a3a3a;
+        }
+        button {
+            padding: 12px 24px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #4f46e5;
+        }
+        input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #404040;
+            border-radius: 6px;
+            background: #2d2d2d;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Проверка подключения к серверу</h1>
+    
+    <div class="info status">
+        <h3>Инструкция:</h3>
+        <ol>
+            <li>Убедитесь, что сервер запущен на компьютере</li>
+            <li>Введите IP адрес сервера (показан при запуске start-server.bat)</li>
+            <li>Нажмите "Проверить подключение"</li>
+        </ol>
+    </div>
+    
+    <div>
+        <label>
+            <strong>URL сервера:</strong><br>
+            <input type="text" id="serverUrl" placeholder="http://192.168.1.100:5000" value="">
+        </label>
+        <br><br>
+        <button onclick="checkConnection()">Проверить подключение</button>
+        <button onclick="autoDetect()">Автоопределение</button>
+    </div>
+    
+    <div id="result"></div>
+    
+    <script>
+        async function checkConnection() {
+            const url = document.getElementById('serverUrl').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            if (!url) {
+                resultDiv.innerHTML = '<div class="error status">Введите URL сервера</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div class="info status">Проверка подключения...</div>';
+            
+            try {
+                // Проверяем основной endpoint
+                const response = await fetch(`${url}/api/server-info`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <div class="success status">
+                            <h3>✅ Подключение успешно!</h3>
+                            <p><strong>IP сервера:</strong> ${data.ip}</p>
+                            <p><strong>Порт:</strong> ${data.port}</p>
+                            <p><strong>URL:</strong> ${data.url}</p>
+                            <p style="margin-top: 20px;">
+                                Используйте этот URL в настройках приложения на телефоне:
+                                <br><strong>${data.url}</strong>
+                            </p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error status">
+                            <h3>❌ Ошибка подключения</h3>
+                            <p>Сервер ответил с кодом: ${response.status}</p>
+                            <p>Проверьте, что сервер запущен и URL правильный</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error status">
+                        <h3>❌ Не удалось подключиться</h3>
+                        <p><strong>Ошибка:</strong> ${error.message}</p>
+                        <p><strong>Возможные причины:</strong></p>
+                        <ul>
+                            <li>Сервер не запущен на компьютере</li>
+                            <li>Неправильный IP адрес</li>
+                            <li>Файрвол блокирует подключение</li>
+                            <li>Устройства не в одной Wi-Fi сети</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+        
+        async function autoDetect() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="info status">Поиск сервера в сети...</div>';
+            
+            // Пробуем определить локальный IP
+            const hostname = window.location.hostname;
+            const parts = hostname.split('.');
+            
+            if (parts.length === 4) {
+                // Если открыто с IP адреса, используем его
+                const baseIp = parts.slice(0, 3).join('.');
+                document.getElementById('serverUrl').value = `http://${hostname}:5000`;
+                await checkConnection();
+            } else {
+                // Пробуем common IP ranges
+                const commonRanges = [
+                    '192.168.1',
+                    '192.168.0',
+                    '10.0.0',
+                    '172.16.0'
+                ];
+                
+                let found = false;
+                for (const range of commonRanges) {
+                    for (let i = 1; i <= 255; i++) {
+                        const testUrl = `http://${range}.${i}:5000`;
+                        try {
+                            const response = await fetch(`${testUrl}/api/server-info`, {
+                                method: 'GET',
+                                signal: AbortSignal.timeout(500)
+                            });
+                            if (response.ok) {
+                                document.getElementById('serverUrl').value = testUrl;
+                                await checkConnection();
+                                found = true;
+                                break;
+                            }
+                        } catch (e) {
+                            // Продолжаем поиск
+                        }
+                    }
+                    if (found) break;
+                }
+                
+                if (!found) {
+                    resultDiv.innerHTML = `
+                        <div class="error status">
+                            <h3>❌ Сервер не найден автоматически</h3>
+                            <p>Введите IP адрес вручную (показан при запуске start-server.bat)</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Автоматическая проверка при загрузке, если открыто с IP
+        window.addEventListener('load', () => {
+            const hostname = window.location.hostname;
+            if (/^\d+\.\d+\.\d+\.\d+$/.test(hostname)) {
+                document.getElementById('serverUrl').value = `http://${hostname}:5000`;
+            }
+        });
+    </script>
+</body>
+</html>
+

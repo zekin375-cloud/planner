@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Ежедневник с задачами</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Хедер -->
+    <header class="app-header">
+        <div class="header-content">
+            <div class="header-top-row">
+                <div class="header-logo" style="display: flex; align-items: center; gap: 12px;">
+                    <button class="btn-open-projects" id="openProjectsBtn" title="Открыть проекты" style="display: none;">
+                        ☰
+                    </button>
+                    <h1>Планировщик</h1>
+                </div>
+                <div class="header-actions">
+                    <!-- Кнопка начала рабочего дня -->
+                    <button class="btn-start-workday" id="startWorkdayBtn" style="display: flex;">
+                        <span class="btn-icon">🍅</span>
+                        <span class="btn-text">Начать рабочий день</span>
+                    </button>
+                    <!-- Помидорный таймер -->
+                    <div class="pomodoro-timer" id="pomodoroTimer" style="display: none;">
+                        <div class="pomodoro-info">
+                            <span class="pomodoro-status" id="pomodoroStatus">Работа</span>
+                            <span class="pomodoro-time" id="pomodoroTime">25:00</span>
+                        </div>
+                        <div class="pomodoro-controls">
+                            <button class="btn-pomodoro" id="pausePomodoroBtn">⏸</button>
+                            <button class="btn-pomodoro" id="stopPomodoroBtn">⏹</button>
+                        </div>
+                    </div>
+                    <!-- Кнопка включения/выключения защиты пинкодом -->
+                    <button class="btn-pincode-toggle" id="togglePincodeBtn" title="Включить защиту пинкодом">
+                        <span class="btn-icon">🔒</span>
+                    </button>
+                    <div class="user-menu">
+                        <button class="user-avatar" id="userMenuBtn" title="Настройки">
+                            <span class="avatar-icon">👤</span>
+                        </button>
+                        <div class="user-popup" id="userPopup" style="display: none;">
+                            <div class="popup-content">
+                                <div class="user-menu-item" id="statsMenuItem">
+                                    📊 Статистика
+                                </div>
+                                <div class="user-menu-item" id="serverSettingsMenuItem">
+                                    ⚙️ Настройки сервера
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Левая панель проектов -->
+        <aside class="projects-panel" id="projectsPanel">
+            <div class="panel-header">
+                <h2>Проекты</h2>
+                <div class="panel-header-actions">
+                    <button class="btn-add-project" id="addProjectBtn" title="Добавить проект">
+                        <span class="icon">+</span>
+                    </button>
+                    <button class="btn-toggle-panel" id="togglePanelBtn" title="Свернуть/Развернуть панель">
+                        <span class="icon" id="togglePanelIcon">◀</span>
+                    </button>
+                </div>
+            </div>
+            <div class="projects-list" id="projectsList">
+                <!-- Проекты будут загружены через JavaScript -->
+            </div>
+            <div class="stats-menu" id="statsMenu" style="display: none;">
+                <!-- Меню статистики будет добавлено через JavaScript -->
+            </div>
+            <div class="projects-footer">
+                <div class="projects-footer-list" id="projectsFooterList">
+                    <!-- Ежедневник и Все задачи будут добавлены сюда -->
+                </div>
+                <button class="btn-passwords" id="passwordsBtn" title="Менеджер паролей">
+                    🔐 Пароли
+                </button>
+            </div>
+        </aside>
+
+        <!-- Основная область -->
+        <main class="main-content">
+            <!-- Левая часть - Задачи -->
+            <section class="tasks-section">
+                <div class="section-header">
+                    <h2 id="leftSectionTitle">Задачи</h2>
+                    <div class="search-container" id="searchContainer">
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            class="search-input" 
+                            placeholder="Поиск по задачам..."
+                            autocomplete="off"
+                        >
+                        <button class="search-clear" id="clearSearchBtn" style="display: none;">×</button>
+                    </div>
+                    <div class="section-header-actions-right">
+                        <button class="btn-add-password" id="addPasswordBtn" style="display: none;" title="Добавить пароль">
+                            <span class="icon">+</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="task-input-container" id="taskInputContainer">
+                    <input 
+                        type="text" 
+                        id="taskInput" 
+                        class="task-input" 
+                        placeholder="Добавить новую задачу..."
+                        autocomplete="off"
+                    >
+                    <button class="btn-add-task" id="addTaskBtn">
+                        <span class="icon">+</span>
+                    </button>
+                </div>
+                <div class="tasks-container" id="tasksContainer">
+                    <div class="empty-state" id="emptyTasksState">
+                        <p>Выберите проект или создайте новую задачу</p>
+                    </div>
+                </div>
+                <div class="tasks-footer">
+                    <button class="btn-show-completed" id="showCompletedBtn" title="Показать завершенные" style="display: none;">
+                        ✓ Завершенные
+                    </button>
+                    <button class="btn-calendar" id="calendarBtn" title="Календарь" style="display: none;">
+                        📅 Календарь
+                    </button>
+                    <button class="btn-back-to-daily" id="backToDailyBtn" title="Вернуться к ежедневнику" style="display: none;">
+                        ← Ежедневник
+                    </button>
+                </div>
+            </section>
+
+            <!-- Правая часть - Заметки/Пароль -->
+            <section class="notes-section">
+                <div class="section-header">
+                    <h2 id="rightPanelTitle">Заметки</h2>
+                    <span class="save-indicator" id="saveIndicator">Сохранено</span>
+                </div>
+                <!-- Срок выполнения задачи -->
+                <div id="taskDeadlineSection" class="task-deadline-section" style="display: none;">
+                    <div class="deadline-container">
+                        <label class="deadline-label">Срок выполнения:</label>
+                        <input type="date" id="taskDeadlineInput" class="deadline-input">
+                        <button class="btn-clear-deadline" id="clearDeadlineBtn" title="Убрать срок">×</button>
+                    </div>
+                </div>
+                <!-- Календарь -->
+                <div id="calendarView" class="calendar-view" style="display: none;">
+                    <div class="calendar-header">
+                        <button class="btn-calendar-nav" id="calendarPrevMonth">‹</button>
+                        <h3 id="calendarMonthYear"></h3>
+                        <button class="btn-calendar-nav" id="calendarNextMonth">›</button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid"></div>
+                </div>
+                <!-- Заметки -->
+                <div 
+                    id="notesTextarea" 
+                    class="notes-textarea" 
+                    contenteditable="true"
+                    data-placeholder="Начните писать заметки..."
+                ></div>
+                <!-- Просмотр пароля -->
+                <div id="passwordView" class="password-view" style="display: none;">
+                    <div class="password-view-header">
+                        <h3 id="passwordViewTitle">Пароль</h3>
+                    </div>
+                    <div class="password-view-body">
+                        <div class="password-view-item">
+                            <label>Название</label>
+                            <div id="passwordViewName" class="password-view-value">-</div>
+                        </div>
+                        <div class="password-view-item">
+                            <label>Имя пользователя / Email</label>
+                            <div id="passwordViewUsername" class="password-view-value">-</div>
+                        </div>
+                        <div class="password-view-item">
+                            <label>Пароль</label>
+                            <div class="password-view-password-group">
+                                <div id="passwordViewPassword" class="password-view-value password-hidden">••••••••</div>
+                                <button class="btn-show-password" id="showPasswordViewBtn" type="button">👁</button>
+                                <button class="btn-copy-password" id="copyPasswordViewBtn" type="button" title="Копировать пароль">📋</button>
+                            </div>
+                        </div>
+                        <div class="password-view-item">
+                            <label>URL</label>
+                            <div id="passwordViewUrl" class="password-view-value">-</div>
+                        </div>
+                        <div class="password-view-item">
+                            <label>Заметки</label>
+                            <div id="passwordViewNotes" class="password-view-value">-</div>
+                        </div>
+                    </div>
+                    <div class="password-view-actions">
+                        <button type="button" class="btn-primary" id="editPasswordBtn">Редактировать</button>
+                        <button type="button" class="btn-danger" id="deletePasswordViewBtn">Удалить</button>
+                    </div>
+                </div>
+                <!-- Таймер работы над задачей (в подвале) -->
+                <div id="taskTimerSection" class="task-timer-section" style="display: none;">
+                    <div class="timer-display" id="taskTimerDisplay" style="display: none;">
+                        <div class="timer-label">Время работы:</div>
+                        <div class="timer-value" id="taskTimerValue">00:00:00</div>
+                    </div>
+                    <div class="task-timer-actions">
+                        <button type="button" class="btn-start-task" id="startTaskBtn">
+                            ▶ Начать задачу
+                        </button>
+                        <button type="button" class="btn-stop-task" id="stopTaskBtn">
+                            ⏹ Завершить задачу
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Модальное окно для создания проекта -->
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Новый проект</h3>
+                <button class="modal-close" id="closeProjectModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Название проекта</label>
+                    <input 
+                        type="text" 
+                        id="projectNameInput" 
+                        class="modal-input" 
+                        placeholder="Название проекта..."
+                        autocomplete="off"
+                    >
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="projectIsSubscription" style="width: auto; margin-right: 8px;">
+                        Абонентский проект
+                    </label>
+                </div>
+                <div class="form-group" id="projectSubscriptionFields" style="display: none;">
+                    <label>Ежемесячная стоимость (₽)</label>
+                    <input 
+                        type="number" 
+                        id="projectMonthlyPriceInput" 
+                        class="modal-input" 
+                        placeholder="0"
+                        step="0.01"
+                        min="0"
+                    >
+                </div>
+                <div class="form-group" id="projectPaymentDateFields" style="display: none;">
+                    <label>Дата оплаты</label>
+                    <input 
+                        type="date" 
+                        id="projectPaymentDateInput" 
+                        class="modal-input"
+                    >
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelProjectBtn">Отмена</button>
+                <button class="btn-primary" id="saveProjectBtn">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для редактирования задачи -->
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Редактировать задачу</h3>
+                <button class="modal-close" id="closeTaskModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Название задачи</label>
+                    <input 
+                        type="text" 
+                        id="taskTitleInput" 
+                        class="modal-input" 
+                        placeholder="Название задачи..."
+                        autocomplete="off"
+                    >
+                </div>
+                <div class="form-group">
+                    <label>Стоимость задачи (₽)</label>
+                    <input 
+                        type="number" 
+                        id="taskPriceInput" 
+                        class="modal-input" 
+                        placeholder="0"
+                        step="0.01"
+                        min="0"
+                    >
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelTaskBtn">Отмена</button>
+                <button class="btn-primary" id="saveTaskBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для события календаря -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="eventModalTitle">Новое событие</h3>
+                <button class="modal-close" id="closeEventModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Название события</label>
+                    <input 
+                        type="text" 
+                        id="eventTitleInput" 
+                        class="modal-input" 
+                        placeholder="Название события..."
+                        autocomplete="off"
+                    >
+                </div>
+                <div class="form-group">
+                    <label>Дата</label>
+                    <input 
+                        type="date" 
+                        id="eventDateInput" 
+                        class="modal-input"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label>Время (необязательно)</label>
+                    <input 
+                        type="time" 
+                        id="eventTimeInput" 
+                        class="modal-input"
+                    >
+                </div>
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea 
+                        id="eventDescriptionInput" 
+                        class="modal-textarea" 
+                        placeholder="Описание события..."
+                        rows="4"
+                    ></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelEventBtn">Отмена</button>
+                <button class="btn-primary" id="saveEventBtn">Сохранить</button>
+                <button class="btn-danger" id="deleteEventBtn" style="display: none;">Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для выбора проекта -->
+    <div class="modal" id="selectProjectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Выберите проект для задачи</h3>
+                <button class="modal-close" id="closeSelectProjectModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="projects-select-list" id="projectsSelectList">
+                    <!-- Список проектов будет загружен через JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelSelectProjectBtn">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для пароля -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-content password-modal-content">
+            <div class="modal-header">
+                <h3 id="passwordModalTitle">Новый пароль</h3>
+                <button class="modal-close" id="closePasswordModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="passwordForm">
+                    <div class="password-form-grid">
+                        <div class="password-form-column">
+                            <div class="form-group">
+                                <label>Тип</label>
+                                <select id="passwordType" class="form-input" required>
+                                    <option value="website">🌐 Сайт</option>
+                                    <option value="ssh">🔐 SSH</option>
+                                    <option value="database">🗄️ База данных</option>
+                                    <option value="email">📧 Email</option>
+                                    <option value="ftp">📁 FTP</option>
+                                    <option value="vpn">🔒 VPN</option>
+                                    <option value="other">📝 Другое</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Название</label>
+                                <input type="text" id="passwordName" class="form-input" placeholder="Название сервиса..." required>
+                            </div>
+                            <div class="form-group">
+                                <label>Имя пользователя / Email</label>
+                                <input type="text" id="passwordUsername" class="form-input" placeholder="username@example.com" autocomplete="username">
+                            </div>
+                            <div class="form-group">
+                                <label>URL</label>
+                                <input type="url" id="passwordUrl" class="form-input" placeholder="https://example.com">
+                            </div>
+                        </div>
+                        <div class="password-form-column">
+                            <div class="form-group">
+                                <label>Пароль</label>
+                                <div class="password-input-group">
+                                    <input type="password" id="passwordValue" class="form-input password-input" placeholder="Пароль..." required autocomplete="current-password">
+                                    <button class="btn-show-password" id="showPasswordBtn" type="button">👁</button>
+                                    <button class="btn-copy-password" id="copyPasswordBtn" type="button" title="Копировать пароль">📋</button>
+                                </div>
+                                <div class="password-strength-container">
+                                    <div class="password-strength-bar">
+                                        <div class="password-strength-fill" id="passwordStrengthFill"></div>
+                                    </div>
+                                    <div class="password-strength-text" id="passwordStrengthText"></div>
+                                </div>
+                                <button type="button" class="btn-generate-password" id="generatePasswordBtn">🔑 Сгенерировать пароль</button>
+                            </div>
+                            <div class="form-group">
+                                <label>Заметки</label>
+                                <textarea id="passwordNotes" class="form-textarea" placeholder="Дополнительные заметки..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="cancelPasswordBtn">Отмена</button>
+                <button type="button" class="btn-primary" id="savePasswordBtn">Сохранить</button>
+                <button type="button" class="btn-danger" id="deletePasswordBtn" style="display: none;">Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для ввода пинкода -->
+    <div class="modal" id="pincodeModal">
+        <div class="modal-content pincode-modal-content">
+            <div class="modal-header">
+                <h3>🔒 Требуется пинкод</h3>
+            </div>
+            <div class="modal-body">
+                <p class="pincode-description">Сайт был заблокирован из-за неактивности. Введите пинкод для разблокировки.</p>
+                <div class="form-group">
+                    <div class="pincode-inputs-container">
+                        <input 
+                            type="password" 
+                            id="pincodeInput1" 
+                            class="pincode-digit-input" 
+                            maxlength="1"
+                            autocomplete="off"
+                            inputmode="numeric"
+                            pattern="[0-9]"
+                        >
+                        <input 
+                            type="password" 
+                            id="pincodeInput2" 
+                            class="pincode-digit-input" 
+                            maxlength="1"
+                            autocomplete="off"
+                            inputmode="numeric"
+                            pattern="[0-9]"
+                        >
+                        <input 
+                            type="password" 
+                            id="pincodeInput3" 
+                            class="pincode-digit-input" 
+                            maxlength="1"
+                            autocomplete="off"
+                            inputmode="numeric"
+                            pattern="[0-9]"
+                        >
+                        <input 
+                            type="password" 
+                            id="pincodeInput4" 
+                            class="pincode-digit-input" 
+                            maxlength="1"
+                            autocomplete="off"
+                            inputmode="numeric"
+                            pattern="[0-9]"
+                        >
+                    </div>
+                    <div class="pincode-error" id="pincodeError" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="submitPincodeBtn">Разблокировать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Загружаем модули в правильном порядке -->
+    <script type="module" src="{{ url_for('static', filename='js/config.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/api.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/server-settings.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/state.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/ui.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/search.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/projects.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/tasks.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/timer.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/pomodoro.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/notes.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/passwords.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/idle-timeout.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
+

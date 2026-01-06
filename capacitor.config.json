@@ -1,0 +1,23 @@
+{
+  "appId": "com.planner.app",
+  "appName": "Планировщик",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "http",
+    "hostname": "localhost",
+    "port": 5000,
+    "url": "http://localhost:5000"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#1a1a1a"
+    }
+  }
+}
+
