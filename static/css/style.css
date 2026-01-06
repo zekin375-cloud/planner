@@ -2603,16 +2603,17 @@ body.locked #pincodeModal .modal-content {
         flex-direction: column;
     }
     
-    /* Панель проектов - скрывается по умолчанию, показывается как overlay */
+    /* Панель проектов - скрывается по умолчанию, показывается как overlay на всю ширину */
     .projects-panel {
         position: fixed;
         left: -100%;
         top: 0;
         bottom: 0;
-        width: 280px;
+        width: 100%;
+        max-width: 100%;
         z-index: 1000;
-        transition: left 0.3s ease;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 2px 0 20px rgba(0, 0, 0, 0.5);
     }
     
     .projects-panel.show {
@@ -2620,7 +2621,7 @@ body.locked #pincodeModal .modal-content {
     }
     
     .projects-panel.collapsed {
-        width: 280px;
+        width: 100%;
     }
     
     /* Кнопка открытия панели в хедере на мобильных */
@@ -2652,12 +2653,46 @@ body.locked #pincodeModal .modal-content {
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.7);
         z-index: 999;
+        backdrop-filter: blur(8px);
+        animation: fadeIn 0.3s ease;
     }
     
-    .projects-panel.show ~ .projects-panel-overlay {
+    .projects-panel.show ~ .projects-panel-overlay,
+    #projectsPanelOverlay {
         display: block;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    /* Улучшаем отступы для мобильной панели */
+    @media (max-width: 768px) {
+        .projects-panel .panel-header {
+            padding: 20px 16px;
+        }
+        
+        .projects-panel .projects-list {
+            padding: 12px;
+        }
+        
+        .projects-panel .project-item {
+            padding: 16px;
+            font-size: 16px;
+            min-height: 56px;
+            margin-bottom: 8px;
+        }
+        
+        .projects-panel .projects-footer {
+            padding: 16px;
+        }
     }
     
     /* Основной контент - на всю ширину */
