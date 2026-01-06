@@ -1,7 +1,39 @@
 // Механизм обновления приложения без пересборки APK
+//
+// ВАЖНО: Обновление работает по-разному в зависимости от конфигурации:
+//
+// 1. В БРАУЗЕРЕ:
+//    - Обновление работает через очистку кэша и перезагрузку страницы
+//    - Новый контент загружается с сервера автоматически
+//
+// 2. В CAPACITOR ПРИЛОЖЕНИИ:
+//    - Если контент встроен в APK (assets) - обновление НЕВОЗМОЖНО без пересборки APK
+//      Простая перезагрузка не поможет, так как WebView загружает из встроенных файлов
+//    
+//    - Если настроен server.url в capacitor.config.json - контент загружается с сервера
+//      и обновление работает через перезагрузку WebView
+//
+//    РЕШЕНИЕ: Для обновления без пересборки APK нужно:
+//    а) Настроить server.url в capacitor.config.json на адрес вашего сервера
+//    б) Убедиться, что сервер доступен с устройства
+//    в) Использовать эту функцию для перезагрузки WebView
+//
+//    Пример конфигурации capacitor.config.json:
+//    {
+//      "server": {
+//        "url": "http://192.168.1.100:5000",
+//        "androidScheme": "https"
+//      }
+//    }
 
 import { apiGet } from './api.js';
 import { isCapacitor } from './config.js';
+
+// Импортируем Capacitor App если доступен
+let CapacitorApp = null;
+if (isCapacitor() && window.Capacitor && window.Capacitor.Plugins) {
+    CapacitorApp = window.Capacitor.Plugins.App;
+}
 
 let currentVersion = '1.0.0';
 let updateCheckInterval = null;
@@ -89,7 +121,7 @@ function showMessage(message, type = 'info') {
 }
 
 // Проверка обновлений
-export async function checkForUpdates(showNotification = true) {
+export async function checkForUpdates(showNotification = true, forceUpdate = false) {
     // Показываем индикатор загрузки
     showMessage('Проверка обновлений...', 'info');
     
@@ -103,8 +135,8 @@ export async function checkForUpdates(showNotification = true) {
         const localVersion = getLocalVersion();
         const serverVersionStr = serverVersion.version || '1.0.0';
         
-        // Сравниваем версии
-        if (serverVersionStr !== localVersion) {
+        // Сравниваем версии или принудительно показываем обновление
+        if (serverVersionStr !== localVersion || forceUpdate) {
             // Обновляем время последней проверки
             saveLocalVersion(serverVersionStr);
             if (showNotification) {
@@ -132,15 +164,28 @@ export async function checkForUpdates(showNotification = true) {
 
 // Показать уведомление о доступном обновлении
 function showUpdateAvailableNotification(version) {
+    // Проверяем, встроен ли контент в APK
+    const isContentEmbedded = isCapacitor() && 
+        (!window.Capacitor?.Plugins?.App?.getState || 
+         window.location.protocol === 'file:' ||
+         window.location.href.includes('capacitor://'));
+    
     // Создаем уведомление в UI
     const notification = document.createElement('div');
     notification.id = 'updateNotification';
     notification.className = 'update-notification';
+    
+    let warningText = '';
+    if (isContentEmbedded) {
+        warningText = '<p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">⚠️ Внимание: Контент встроен в APK. Для обновления может потребоваться пересборка приложения.</p>';
+    }
+    
     notification.innerHTML = `
         <div class="update-notification-content">
             <div class="update-notification-text">
                 <strong>🔄 Доступно обновление</strong>
                 <p>Версия ${version} доступна для загрузки</p>
+                ${warningText}
             </div>
             <div class="update-notification-actions">
                 <button class="btn-update-now" id="updateNowBtn">Обновить сейчас</button>
@@ -281,7 +326,25 @@ export async function updateApp() {
     showUpdateProgress();
     
     try {
-        // Очищаем кэш
+        // Получаем версию с сервера
+        const serverVersion = await getServerVersion();
+        if (serverVersion) {
+            saveLocalVersion(serverVersion.version);
+        }
+        
+        // Очищаем кэш Service Worker если есть
+        if ('serviceWorker' in navigator) {
+            try {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (let registration of registrations) {
+                    await registration.unregister();
+                }
+            } catch (e) {
+                console.warn('Ошибка при отключении Service Worker:', e);
+            }
+        }
+        
+        // Очищаем все кэши
         if ('caches' in window) {
             const cacheNames = await caches.keys();
             await Promise.all(
@@ -289,14 +352,68 @@ export async function updateApp() {
             );
         }
         
-        // Обновляем версию
-        const serverVersion = await getServerVersion();
-        if (serverVersion) {
-            saveLocalVersion(serverVersion.version);
+        // Небольшая задержка для завершения очистки кэша
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // ВАЖНО: В Capacitor приложениях обновление работает по-разному:
+        // 1. Если контент встроен в APK (assets) - обновление невозможно без пересборки APK
+        // 2. Если настроен server.url в capacitor.config.json - контент загружается с сервера
+        //    и обновление работает через перезагрузку
+        
+        // Пытаемся использовать Capacitor App API для перезагрузки
+        if (isCapacitor() && CapacitorApp) {
+            try {
+                // Capacitor App.reload() перезагружает WebView
+                // Если контент загружается с сервера, это загрузит новую версию
+                if (CapacitorApp.reload) {
+                    await CapacitorApp.reload();
+                    return;
+                }
+            } catch (error) {
+                console.warn('Ошибка при использовании Capacitor App.reload():', error);
+            }
         }
         
-        // Перезагружаем страницу с очисткой кэша
-        window.location.reload(true);
+        // Альтернативный способ для Capacitor - принудительная перезагрузка WebView
+        if (isCapacitor()) {
+            // В Capacitor приложениях:
+            // - Если контент встроен в APK: перезагрузка не поможет, нужна пересборка
+            // - Если настроен server.url: перезагрузка загрузит новую версию с сервера
+            // Пытаемся принудительно перезагрузить с очисткой кэша
+            try {
+                // Очищаем кэш WebView через Capacitor API если доступен
+                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+                    // Принудительная перезагрузка с timestamp для обхода кэша
+                    const timestamp = Date.now();
+                    const currentUrl = window.location.href.split('?')[0];
+                    const url = new URL(currentUrl, window.location.origin);
+                    url.searchParams.set('_update', timestamp.toString());
+                    url.searchParams.set('_nocache', timestamp.toString());
+                    
+                    // Используем replace для избежания истории
+                    window.location.replace(url.toString());
+                } else {
+                    // Простая перезагрузка
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.warn('Ошибка перезагрузки в Capacitor:', error);
+                window.location.reload();
+            }
+        } else {
+            // В браузере используем URL с параметрами для обхода кэша
+            const timestamp = Date.now();
+            const currentUrl = window.location.href.split('?')[0];
+            const url = new URL(currentUrl, window.location.origin);
+            url.searchParams.set('_update', timestamp.toString());
+            url.searchParams.set('_nocache', timestamp.toString());
+            
+            if (window.location.replace) {
+                window.location.replace(url.toString());
+            } else {
+                window.location.href = url.toString();
+            }
+        }
     } catch (error) {
         console.error('Ошибка обновления приложения:', error);
         hideUpdateProgress();

@@ -2573,6 +2573,8 @@ body.locked #pincodeModal .modal-content {
     /* Хедер - компактнее */
     .app-header {
         padding: 8px 12px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+        border-bottom: 2px solid #047857;
     }
     
     .header-logo h1 {

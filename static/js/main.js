@@ -163,7 +163,8 @@ function setupEventListeners() {
             const userPopup = document.getElementById('userPopup');
             if (userPopup) userPopup.style.display = 'none';
             const { checkForUpdates } = await import('./app-update.js');
-            await checkForUpdates(true);
+            // Принудительно показываем обновление для тестирования
+            await checkForUpdates(true, true);
         });
     }
     

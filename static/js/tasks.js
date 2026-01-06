@@ -6,6 +6,65 @@ import { getActiveTaskId, timerStartTime, startTimerDisplay, updateTimerUI, upda
 import { showMainNotes } from './notes.js';
 import { apiGet, apiPost, apiPut, apiDelete } from './api.js';
 
+// Глобальная переменная для отслеживания скролла контейнера задач
+let tasksContainerScrolling = false;
+let tasksContainerScrollTimeout = null;
+
+// Инициализация отслеживания скролла контейнера задач
+let scrollTrackingInitialized = false;
+function initTasksContainerScrollTracking() {
+    const container = document.getElementById('tasksContainer');
+    if (!container || scrollTrackingInitialized) return;
+    
+    scrollTrackingInitialized = true;
+    
+    // Отслеживаем скролл контейнера
+    container.addEventListener('scroll', () => {
+        tasksContainerScrolling = true;
+        
+        // Очищаем предыдущий таймаут
+        if (tasksContainerScrollTimeout) {
+            clearTimeout(tasksContainerScrollTimeout);
+        }
+        
+        // Через 200ms после окончания скролла разрешаем клики
+        tasksContainerScrollTimeout = setTimeout(() => {
+            tasksContainerScrolling = false;
+        }, 200);
+    }, { passive: true });
+    
+    // Также отслеживаем touch события на контейнере
+    let containerTouchStartY = 0;
+    container.addEventListener('touchstart', (e) => {
+        containerTouchStartY = e.touches[0].clientY;
+        tasksContainerScrolling = false; // Сбрасываем флаг при новом касании
+    }, { passive: true });
+    
+    container.addEventListener('touchmove', (e) => {
+        if (containerTouchStartY) {
+            const deltaY = Math.abs(e.touches[0].clientY - containerTouchStartY);
+            if (deltaY > 5) {
+                tasksContainerScrolling = true;
+            }
+        }
+    }, { passive: true });
+    
+    container.addEventListener('touchend', () => {
+        containerTouchStartY = 0;
+        // Разрешаем клики через 200ms после окончания touch
+        setTimeout(() => {
+            tasksContainerScrolling = false;
+        }, 200);
+    }, { passive: true });
+}
+
+// Инициализируем отслеживание скролла при загрузке
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTasksContainerScrollTracking);
+} else {
+    initTasksContainerScrollTracking();
+}
+
 // Загрузка задач
 export async function loadTasks() {
     // Разрешаем загрузку если currentProjectId === 0 (Все задачи) или есть режим поиска
@@ -117,7 +176,48 @@ function createTaskElement(task, projectName = null) {
         </div>
     `;
     
-    // Добавляем обработчик клика на весь элемент задачи
+    // Переменные для отслеживания скролла
+    let touchStartY = 0;
+    let touchStartX = 0;
+    let isScrolling = false;
+    let scrollTimeout = null;
+    
+    // Отслеживаем начало касания
+    div.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+        touchStartX = e.touches[0].clientX;
+        isScrolling = false;
+        
+        // Очищаем предыдущий таймаут
+        if (scrollTimeout) {
+            clearTimeout(scrollTimeout);
+        }
+        
+        // Устанавливаем таймаут для определения скролла
+        scrollTimeout = setTimeout(() => {
+            isScrolling = true;
+        }, 100);
+    }, { passive: true });
+    
+    // Отслеживаем движение (скролл)
+    div.addEventListener('touchmove', (e) => {
+        if (!touchStartY || !touchStartX) return;
+        
+        const touchY = e.touches[0].clientY;
+        const touchX = e.touches[0].clientX;
+        const deltaY = Math.abs(touchY - touchStartY);
+        const deltaX = Math.abs(touchX - touchStartX);
+        
+        // Если движение больше 10px, считаем это скроллом
+        if (deltaY > 10 || deltaX > 10) {
+            isScrolling = true;
+            if (scrollTimeout) {
+                clearTimeout(scrollTimeout);
+            }
+        }
+    }, { passive: true });
+    
+    // Обработчик клика для десктопа
     div.addEventListener('click', (e) => {
         // Не обрабатываем клики на чекбокс, кнопки редактирования/удаления
         if (e.target.classList.contains('task-checkbox') || 
@@ -126,10 +226,16 @@ function createTaskElement(task, projectName = null) {
             e.target.closest('.task-actions')) {
             return;
         }
+        
+        // Если контейнер скроллится, не открываем задачу
+        if (tasksContainerScrolling) {
+            return;
+        }
+        
         selectTaskForDescription(task.id);
     });
     
-    // Добавляем поддержку touch событий для тачскринов
+    // Обработчик touch для мобильных устройств
     div.addEventListener('touchend', (e) => {
         // Не обрабатываем touch на чекбокс, кнопки редактирования/удаления
         if (e.target.classList.contains('task-checkbox') || 
@@ -138,8 +244,28 @@ function createTaskElement(task, projectName = null) {
             e.target.closest('.task-actions')) {
             return;
         }
+        
+        // Очищаем таймаут
+        if (scrollTimeout) {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = null;
+        }
+        
+        // Если был скролл элемента или контейнера, не открываем задачу
+        if (isScrolling || tasksContainerScrolling) {
+            isScrolling = false;
+            touchStartY = 0;
+            touchStartX = 0;
+            return;
+        }
+        
         e.preventDefault();
         selectTaskForDescription(task.id);
+        
+        // Сбрасываем флаги
+        isScrolling = false;
+        touchStartY = 0;
+        touchStartX = 0;
     });
     
     return div;

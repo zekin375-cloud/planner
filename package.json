@@ -1,6 +1,6 @@
 {
   "name": "planner-app",
-  "version": "1.0.2",
+  "version": "1.0.6",
   "description": "Планировщик задач для Android",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,7 @@
     "cap:sync": "npx cap sync",
     "cap:add:android": "npx cap add android",
     "cap:open:android": "npx cap open android",
+    "cap:setup-server": "node scripts/setup-capacitor-server.js",
     "android:build": "npm run build && npx cap sync",
     "android:setup": "npm install && npm run cap:add:android && npm run android:build"
   },
