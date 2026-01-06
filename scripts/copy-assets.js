@@ -22,11 +22,20 @@ if (fs.existsSync(templatesDir)) {
 }
 
 // Копируем index.html в корень dist (требуется для Capacitor)
+// И заменяем Flask пути на относительные пути
 const indexHtmlSrc = path.join(templatesDir, 'index.html');
 const indexHtmlDest = path.join(distDir, 'index.html');
 if (fs.existsSync(indexHtmlSrc)) {
-    fs.copyFileSync(indexHtmlSrc, indexHtmlDest);
-    console.log('index.html copied to dist/');
+    let indexHtmlContent = fs.readFileSync(indexHtmlSrc, 'utf8');
+    
+    // Заменяем Flask пути на относительные пути для Capacitor
+    indexHtmlContent = indexHtmlContent.replace(
+        /{{ url_for\('static', filename='([^']+)'\) }}/g,
+        '/static/$1'
+    );
+    
+    fs.writeFileSync(indexHtmlDest, indexHtmlContent, 'utf8');
+    console.log('index.html copied to dist/ with paths fixed for Capacitor');
 }
 
 // Копируем database.py и app.py для локального запуска
