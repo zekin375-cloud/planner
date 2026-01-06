@@ -13,14 +13,14 @@
     "android:setup": "npm install && npm run cap:add:android && npm run android:build"
   },
   "dependencies": {
-    "@capacitor/core": "^5.5.0",
     "@capacitor/android": "^5.5.0",
     "@capacitor/app": "^5.0.6",
+    "@capacitor/core": "^5.5.0",
     "@capacitor/filesystem": "^5.1.4",
+    "@capacitor/local-notifications": "^5.0.8",
     "@capacitor/network": "^5.0.6"
   },
   "devDependencies": {
     "@capacitor/cli": "^5.5.0"
   }
 }
-

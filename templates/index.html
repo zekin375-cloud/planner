@@ -82,6 +82,17 @@
             <div class="stats-menu" id="statsMenu" style="display: none;">
                 <!-- Меню статистики будет добавлено через JavaScript -->
             </div>
+            <!-- Помидорный таймер для мобильных (скрыт на десктопе) -->
+            <div class="pomodoro-timer-mobile" id="pomodoroTimerMobile" style="display: none;">
+                <div class="pomodoro-info-mobile">
+                    <span class="pomodoro-status-mobile" id="pomodoroStatusMobile">Работа</span>
+                    <span class="pomodoro-time-mobile" id="pomodoroTimeMobile">25:00</span>
+                </div>
+                <div class="pomodoro-controls-mobile">
+                    <button class="btn-pomodoro-mobile" id="pausePomodoroBtnMobile">⏸</button>
+                    <button class="btn-pomodoro-mobile" id="stopPomodoroBtnMobile">⏹</button>
+                </div>
+            </div>
             <div class="projects-footer">
                 <div class="projects-footer-list" id="projectsFooterList">
                     <!-- Ежедневник и Все задачи будут добавлены сюда -->
@@ -147,6 +158,7 @@
             <!-- Правая часть - Заметки/Пароль -->
             <section class="notes-section">
                 <div class="section-header">
+                    <button class="close-notes-btn" id="closeNotesBtn" type="button" title="Закрыть заметки" style="display: none;">←</button>
                     <h2 id="rightPanelTitle">Заметки</h2>
                     <span class="save-indicator" id="saveIndicator">Сохранено</span>
                 </div>
@@ -462,53 +474,59 @@
             <div class="modal-header">
                 <h3>🔒 Требуется пинкод</h3>
             </div>
-            <div class="modal-body">
-                <p class="pincode-description">Сайт был заблокирован из-за неактивности. Введите пинкод для разблокировки.</p>
-                <div class="form-group">
-                    <div class="pincode-inputs-container">
-                        <input 
-                            type="password" 
-                            id="pincodeInput1" 
-                            class="pincode-digit-input" 
-                            maxlength="1"
-                            autocomplete="off"
-                            inputmode="numeric"
-                            pattern="[0-9]"
-                        >
-                        <input 
-                            type="password" 
-                            id="pincodeInput2" 
-                            class="pincode-digit-input" 
-                            maxlength="1"
-                            autocomplete="off"
-                            inputmode="numeric"
-                            pattern="[0-9]"
-                        >
-                        <input 
-                            type="password" 
-                            id="pincodeInput3" 
-                            class="pincode-digit-input" 
-                            maxlength="1"
-                            autocomplete="off"
-                            inputmode="numeric"
-                            pattern="[0-9]"
-                        >
-                        <input 
-                            type="password" 
-                            id="pincodeInput4" 
-                            class="pincode-digit-input" 
-                            maxlength="1"
-                            autocomplete="off"
-                            inputmode="numeric"
-                            pattern="[0-9]"
-                        >
+            <form id="pincodeForm" onsubmit="event.preventDefault(); checkPincode();">
+                <div class="modal-body">
+                    <p class="pincode-description">Сайт был заблокирован из-за неактивности. Введите пинкод для разблокировки.</p>
+                    <div class="form-group">
+                        <div class="pincode-inputs-container">
+                            <input 
+                                type="password" 
+                                id="pincodeInput1" 
+                                class="pincode-digit-input" 
+                                maxlength="1"
+                                autocomplete="off"
+                                inputmode="numeric"
+                                pattern="[0-9]"
+                                required
+                            >
+                            <input 
+                                type="password" 
+                                id="pincodeInput2" 
+                                class="pincode-digit-input" 
+                                maxlength="1"
+                                autocomplete="off"
+                                inputmode="numeric"
+                                pattern="[0-9]"
+                                required
+                            >
+                            <input 
+                                type="password" 
+                                id="pincodeInput3" 
+                                class="pincode-digit-input" 
+                                maxlength="1"
+                                autocomplete="off"
+                                inputmode="numeric"
+                                pattern="[0-9]"
+                                required
+                            >
+                            <input 
+                                type="password" 
+                                id="pincodeInput4" 
+                                class="pincode-digit-input" 
+                                maxlength="1"
+                                autocomplete="off"
+                                inputmode="numeric"
+                                pattern="[0-9]"
+                                required
+                            >
+                        </div>
+                        <div class="pincode-error" id="pincodeError" style="display: none;"></div>
                     </div>
-                    <div class="pincode-error" id="pincodeError" style="display: none;"></div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-primary" id="submitPincodeBtn">Разблокировать</button>
-            </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-primary" id="submitPincodeBtn">Разблокировать</button>
+                </div>
+            </form>
         </div>
     </div>
 

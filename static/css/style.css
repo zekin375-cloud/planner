@@ -2598,6 +2598,142 @@ body.locked #pincodeModal .modal-content {
         height: 32px;
     }
     
+    /* Помидорный таймер - адаптация для мобильных */
+    .pomodoro-timer {
+        min-width: auto;
+        width: 100%;
+        max-width: 100%;
+        padding: 10px 12px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .pomodoro-info {
+        flex: 1;
+        min-width: 0;
+        gap: 10px;
+    }
+    
+    .pomodoro-status {
+        font-size: 10px;
+        padding: 6px 10px;
+        white-space: nowrap;
+    }
+    
+    .pomodoro-time {
+        font-size: 20px;
+        letter-spacing: 0.5px;
+        min-width: 60px;
+    }
+    
+    .pomodoro-controls {
+        gap: 8px;
+        flex-shrink: 0;
+    }
+    
+    .btn-pomodoro {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        min-width: 40px;
+        min-height: 40px;
+    }
+    
+    /* Помидорный таймер в левом меню на мобильных */
+    .pomodoro-timer-mobile {
+        display: none;
+        padding: 12px;
+        margin: 12px;
+        background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .pomodoro-timer-mobile.work {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, var(--bg-secondary) 100%);
+        border-top-color: var(--accent);
+    }
+    
+    .pomodoro-timer-mobile.break {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, var(--bg-secondary) 100%);
+        border-top-color: var(--success);
+    }
+    
+    .pomodoro-info-mobile {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .pomodoro-status-mobile {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        padding: 4px 10px;
+        background: var(--bg-hover);
+        border-radius: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .pomodoro-timer-mobile.work .pomodoro-status-mobile {
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+        color: white;
+    }
+    
+    .pomodoro-timer-mobile.break .pomodoro-status-mobile {
+        background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+        color: white;
+    }
+    
+    .pomodoro-time-mobile {
+        font-size: 20px;
+        font-weight: 700;
+        font-family: 'Courier New', monospace;
+        color: var(--accent);
+        letter-spacing: 1px;
+    }
+    
+    .pomodoro-timer-mobile.work .pomodoro-time-mobile {
+        color: var(--accent);
+    }
+    
+    .pomodoro-timer-mobile.break .pomodoro-time-mobile {
+        color: var(--success);
+    }
+    
+    .pomodoro-controls-mobile {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .btn-pomodoro-mobile {
+        flex: 1;
+        height: 40px;
+        border: none;
+        background: var(--bg-hover);
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        color: var(--text-primary);
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+    }
+    
+    .btn-pomodoro-mobile:hover,
+    .btn-pomodoro-mobile:active {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+    }
+    
     /* Контейнер - вертикальная компоновка на мобильных */
     .container {
         flex-direction: column;
@@ -2611,9 +2747,13 @@ body.locked #pincodeModal .modal-content {
         bottom: 0;
         width: 100%;
         max-width: 100%;
+        height: 100vh;
         z-index: 1000;
         transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 2px 0 20px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
     
     .projects-panel.show {
@@ -2675,12 +2815,22 @@ body.locked #pincodeModal .modal-content {
     
     /* Улучшаем отступы для мобильной панели */
     @media (max-width: 768px) {
+        .projects-panel {
+            height: 100vh !important;
+            max-height: 100vh !important;
+        }
+        
         .projects-panel .panel-header {
             padding: 20px 16px;
+            flex-shrink: 0;
         }
         
         .projects-panel .projects-list {
             padding: 12px;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 0;
         }
         
         .projects-panel .project-item {
@@ -2692,6 +2842,8 @@ body.locked #pincodeModal .modal-content {
         
         .projects-panel .projects-footer {
             padding: 16px;
+            flex-shrink: 0;
+            border-top: 1px solid var(--border);
         }
     }
     
@@ -2900,6 +3052,32 @@ body.locked #pincodeModal .modal-content {
     .statistics-icon {
         font-size: 24px;
     }
+    
+    /* Помидорный таймер - еще более компактный на маленьких экранах */
+    .pomodoro-timer {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+    
+    .pomodoro-info {
+        gap: 8px;
+    }
+    
+    .pomodoro-status {
+        font-size: 9px;
+        padding: 5px 8px;
+    }
+    
+    .pomodoro-time {
+        font-size: 18px;
+        min-width: 55px;
+    }
+    
+    .btn-pomodoro {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
 }
 
 /* Портретная ориентация */
@@ -2907,6 +3085,68 @@ body.locked #pincodeModal .modal-content {
     .tasks-section,
     .notes-section {
         height: 50vh;
+    }
+    
+    /* На мобильных скрываем секцию заметок по умолчанию, показываем только при выборе задачи */
+    @media (max-width: 768px) {
+        .notes-section {
+            display: none !important;
+        }
+        
+        .notes-section.task-selected {
+            display: flex !important;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 998;
+            background: var(--bg-primary);
+            flex-direction: column;
+            animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Кнопка закрытия заметок на мобильных */
+        .notes-section.task-selected .section-header {
+            position: relative;
+            padding-left: 60px;
+        }
+        
+        .notes-section.task-selected .close-notes-btn {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            border: none;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+        
+        .notes-section.task-selected .close-notes-btn:hover,
+        .notes-section.task-selected .close-notes-btn:active {
+            background: var(--bg-hover);
+            transform: translateY(-50%) scale(1.1);
+        }
+    }
+    
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+        }
+        to {
+            transform: translateX(0);
+        }
     }
 }
 

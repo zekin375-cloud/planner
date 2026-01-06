@@ -408,9 +408,19 @@ export async function deleteTask(taskId, event) {
 // Показать заметки при клике на задачу
 export async function selectTaskForDescription(taskId) {
     // Получаем задачу из текущего списка
-    const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+    let taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+    
+    // Если элемент не найден, пытаемся загрузить задачи
     if (!taskElement) {
-        console.warn('Элемент задачи не найден:', taskId);
+        console.info('Элемент задачи не найден, загружаем задачи...', taskId);
+        await loadTasks();
+        // Ждем немного для рендеринга
+        await new Promise(resolve => setTimeout(resolve, 100));
+        taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+    }
+    
+    if (!taskElement) {
+        console.warn('Элемент задачи не найден после загрузки:', taskId);
         return;
     }
     
@@ -498,6 +508,19 @@ export async function selectTaskForDescription(taskId) {
     // Показываем и загружаем заметки
     showMainNotes();
     
+    // На мобильных показываем секцию заметок как overlay
+    if (window.innerWidth <= 768) {
+        const notesSection = document.querySelector('.notes-section');
+        const closeNotesBtn = document.getElementById('closeNotesBtn');
+        if (notesSection) {
+            notesSection.classList.add('task-selected');
+            document.body.style.overflow = 'hidden';
+        }
+        if (closeNotesBtn) {
+            closeNotesBtn.style.display = 'flex';
+        }
+    }
+    
     // Фокусируемся на поле заметок для удобства
     setTimeout(() => {
         if (notesTextarea) {
@@ -524,6 +547,20 @@ export async function closeTaskDescription() {
     // Обновляем маршрут
     const { updateTaskRoute } = await import('./router.js');
     updateTaskRoute(null);
+    
+    // На мобильных скрываем секцию заметок
+    if (window.innerWidth <= 768) {
+        const notesSection = document.querySelector('.notes-section');
+        const closeNotesBtn = document.getElementById('closeNotesBtn');
+        if (notesSection) {
+            notesSection.classList.remove('task-selected');
+            document.body.style.overflow = '';
+        }
+        if (closeNotesBtn) {
+            closeNotesBtn.style.display = 'none';
+        }
+    }
+    
     const notesTextarea = document.getElementById('notesTextarea');
     if (notesTextarea) notesTextarea.style.display = 'block';
     

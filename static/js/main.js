@@ -12,6 +12,22 @@ import { initCalendar, deleteCalendarEvent, editCalendarEvent } from './calendar
 import { initIdleProtection, checkPincode, lockSite } from './idle-timeout.js';
 import { showServerSettings } from './server-settings.js';
 
+// Инициализация уведомлений для Capacitor
+async function initNotifications() {
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
+        try {
+            const { LocalNotifications } = window.Capacitor.Plugins;
+            // Запрашиваем разрешение на уведомления
+            const result = await LocalNotifications.requestPermissions();
+            if (result.display === 'granted') {
+                console.log('Разрешение на уведомления получено');
+            }
+        } catch (error) {
+            console.error('Ошибка инициализации уведомлений:', error);
+        }
+    }
+}
+
 // Make functions available globally for inline event handlers
 window.deleteProject = deleteProject;
 window.editTask = editTask;
@@ -34,6 +50,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     initIdleProtection();
     // Инициализируем мобильный интерфейс
     initMobileUI();
+    // Инициализируем уведомления для Capacitor
+    await initNotifications();
     
     // Проверяем, настроен ли сервер перед загрузкой данных
     try {
@@ -41,19 +59,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         const apiUrl = getApiBaseUrl();
         if (apiUrl) {
             // Сервер настроен, загружаем проекты
-            loadProjects();
+            try {
+                await loadProjects();
+            } catch (error) {
+                console.error('Ошибка загрузки проектов:', error);
+                const projectsList = document.getElementById('projectsList');
+                if (projectsList) {
+                    const errorMessage = error.message || 'Не удалось подключиться к серверу';
+                    projectsList.innerHTML = `<div class="empty-state"><p style="color: var(--danger);">Ошибка: ${errorMessage}</p><p style="margin-top: 10px; font-size: 12px;">Проверьте:</p><ul style="text-align: left; margin-top: 5px; font-size: 12px; padding-left: 20px;"><li>Запущен ли сервер на ${apiUrl}</li><li>Правильно ли указан IP адрес в настройках</li><li>Находятся ли устройства в одной Wi-Fi сети</li></ul></div>`;
+                }
+            }
         } else {
             // Сервер не настроен, показываем сообщение
             console.info('Сервер не настроен. Используйте настройки для указания IP адреса сервера.');
             const projectsList = document.getElementById('projectsList');
             if (projectsList) {
-                projectsList.innerHTML = '<div class="empty-state"><p>Сервер не настроен. Перейдите в настройки и укажите IP адрес сервера.</p></div>';
+                projectsList.innerHTML = '<div class="empty-state"><p>Сервер не настроен.</p><p style="margin-top: 10px; font-size: 12px;">Перейдите в настройки (меню пользователя) и укажите IP адрес сервера.</p></div>';
             }
         }
     } catch (error) {
-        console.error('Ошибка проверки конфигурации:', error);
-        // Пытаемся загрузить проекты в любом случае (для браузера)
-        loadProjects();
+        console.error('Ошибка при проверке конфигурации:', error);
+        const projectsList = document.getElementById('projectsList');
+        if (projectsList) {
+            projectsList.innerHTML = `<div class="empty-state"><p style="color: var(--danger);">Ошибка инициализации: ${error.message || 'Неизвестная ошибка'}</p></div>`;
+        }
     }
 });
 
@@ -241,8 +270,61 @@ function setupEventListeners() {
     
     // Модальное окно пинкода - проверка происходит автоматически при заполнении всех 4 полей
     const submitPincodeBtn = document.getElementById('submitPincodeBtn');
+    const pincodeForm = document.getElementById('pincodeForm');
     if (submitPincodeBtn) {
         submitPincodeBtn.addEventListener('click', checkPincode);
+    }
+    if (pincodeForm) {
+        pincodeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            checkPincode();
+        });
+    }
+    
+    // Кнопка закрытия заметок на мобильных
+    const closeNotesBtn = document.getElementById('closeNotesBtn');
+    if (closeNotesBtn) {
+        closeNotesBtn.addEventListener('click', async () => {
+            // Проверяем, что открыто: задача, заметка ежедневника или пароль
+            const { selectedTaskId } = await import('./state.js');
+            const { selectedDailyNoteId } = await import('./daily-notes.js');
+            const { currentPasswordId } = await import('./state.js');
+            
+            if (selectedTaskId) {
+                const { closeTaskDescription } = await import('./tasks.js');
+                await closeTaskDescription();
+            } else {
+                // Проверяем, это заметка ежедневника или пароль
+                const rightTitle = document.getElementById('rightPanelTitle');
+                const isDailyNote = rightTitle && rightTitle.textContent.startsWith('Ежедневник:');
+                const passwordView = document.getElementById('passwordView');
+                const isPassword = passwordView && passwordView.style.display === 'block';
+                
+                if (isDailyNote) {
+                    // Закрываем заметку ежедневника
+                    const notesSection = document.querySelector('.notes-section');
+                    if (notesSection) {
+                        notesSection.classList.remove('task-selected');
+                        document.body.style.overflow = '';
+                    }
+                    if (closeNotesBtn) {
+                        closeNotesBtn.style.display = 'none';
+                    }
+                    // Очищаем заметку
+                    const notesTextarea = document.getElementById('notesTextarea');
+                    if (notesTextarea) {
+                        notesTextarea.innerHTML = '';
+                    }
+                    // Сбрасываем выделение
+                    document.querySelectorAll('.task-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                } else if (isPassword || currentPasswordId) {
+                    const { hidePasswordView } = await import('./passwords.js');
+                    hidePasswordView();
+                }
+            }
+        });
     }
     
 }

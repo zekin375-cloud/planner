@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from database import Database
+import socket
 
 app = Flask(__name__)
 # Включаем CORS для доступа с мобильного приложения
@@ -818,6 +819,44 @@ def delete_calendar_event(event_id):
         return jsonify({'success': True}), 200
     except Exception as e:
         print(f"Ошибка удаления события календаря: {e}")
+        return jsonify({'error': str(e)}), 500
+
+# API для синхронизации помидорного таймера
+@app.route('/api/pomodoro/state', methods=['GET'])
+def get_pomodoro_state():
+    """Получить текущее состояние помидорного таймера"""
+    try:
+        import time
+        state = getattr(app, 'pomodoro_state', None)
+        if state:
+            # Проверяем, не истекло ли время
+            if 'startTime' in state:
+                current_time = int(time.time() * 1000)
+                elapsed = (current_time - state['startTime']) / 1000
+                state['timeLeft'] = max(0, state.get('timeLeft', 0) - int(elapsed))
+        return jsonify(state or {
+            'timeLeft': 25 * 60,
+            'state': 'idle',
+            'workCount': 0
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/pomodoro/state', methods=['POST'])
+def save_pomodoro_state():
+    """Сохранить состояние помидорного таймера"""
+    try:
+        import time
+        data = request.json
+        # Сохраняем состояние в памяти приложения (можно добавить в БД)
+        app.pomodoro_state = {
+            'timeLeft': data.get('timeLeft', 25 * 60),
+            'state': data.get('state', 'idle'),
+            'workCount': data.get('workCount', 0),
+            'startTime': data.get('startTime', int(time.time() * 1000))
+        }
+        return jsonify({'success': True, 'state': app.pomodoro_state})
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

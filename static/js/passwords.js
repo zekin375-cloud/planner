@@ -436,6 +436,19 @@ async function selectPassword(passwordId) {
         }
         
         showPasswordView();
+        
+        // На мобильных показываем секцию заметок как overlay
+        if (window.innerWidth <= 768) {
+            const notesSection = document.querySelector('.notes-section');
+            const closeNotesBtn = document.getElementById('closeNotesBtn');
+            if (notesSection) {
+                notesSection.classList.add('task-selected');
+                document.body.style.overflow = 'hidden';
+            }
+            if (closeNotesBtn) {
+                closeNotesBtn.style.display = 'flex';
+            }
+        }
     } catch (error) {
         console.error('Ошибка загрузки пароля:', error);
     }
@@ -595,6 +608,18 @@ export function hidePasswordModal() {
 
 // Показать просмотр пароля
 function showPasswordView() {
+    // На мобильных показываем секцию заметок как overlay
+    if (window.innerWidth <= 768) {
+        const notesSection = document.querySelector('.notes-section');
+        const closeNotesBtn = document.getElementById('closeNotesBtn');
+        if (notesSection) {
+            notesSection.classList.add('task-selected');
+            document.body.style.overflow = 'hidden';
+        }
+        if (closeNotesBtn) {
+            closeNotesBtn.style.display = 'flex';
+        }
+    }
     const view = document.getElementById('passwordView');
     if (view) {
         view.style.display = 'block';
@@ -606,6 +631,19 @@ function hidePasswordView() {
     const view = document.getElementById('passwordView');
     if (view) {
         view.style.display = 'none';
+    }
+    
+    // На мобильных скрываем секцию заметок
+    if (window.innerWidth <= 768) {
+        const notesSection = document.querySelector('.notes-section');
+        const closeNotesBtn = document.getElementById('closeNotesBtn');
+        if (notesSection) {
+            notesSection.classList.remove('task-selected');
+            document.body.style.overflow = '';
+        }
+        if (closeNotesBtn) {
+            closeNotesBtn.style.display = 'none';
+        }
     }
 }
 

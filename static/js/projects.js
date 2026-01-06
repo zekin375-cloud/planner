@@ -11,16 +11,26 @@ import { hideProjectsPanel } from './ui.js';
 // Загрузка проектов
 export async function loadProjects() {
     try {
-        // Используем apiGet если доступен, иначе обычный fetch
+        // Всегда используем apiGet для единообразия
         let projects;
-        if (typeof apiGet !== 'undefined') {
+        try {
             projects = await apiGet('api/projects');
-        } else {
-            const response = await fetch('/api/projects');
-            projects = await response.json();
+        } catch (error) {
+            console.error('Ошибка загрузки проектов:', error);
+            // Показываем понятное сообщение об ошибке
+            const projectsList = document.getElementById('projectsList');
+            if (projectsList) {
+                const errorMessage = error.message || 'Не удалось загрузить проекты';
+                projectsList.innerHTML = `<div class="empty-state"><p style="color: var(--danger);">Ошибка: ${escapeHtml(errorMessage)}</p><p style="margin-top: 10px; font-size: 12px;">Проверьте настройки сервера в меню пользователя.</p></div>`;
+            }
+            throw error; // Пробрасываем ошибку дальше
         }
         
         const projectsList = document.getElementById('projectsList');
+        if (!projectsList) {
+            console.error('Элемент projectsList не найден');
+            return;
+        }
         projectsList.innerHTML = '';
         
         // Добавляем обычные проекты в список
@@ -69,7 +79,14 @@ export async function loadProjects() {
         
         // Обновляем счетчики задач (уже включены в данные проектов)
     } catch (error) {
-        console.error('Ошибка загрузки проектов:', error);
+        console.error('Ошибка загрузки проектов (внешний catch):', error);
+        // Если ошибка не была обработана во внутреннем try-catch, показываем сообщение
+        const projectsList = document.getElementById('projectsList');
+        if (projectsList) {
+            const errorMessage = error.message || 'Не удалось загрузить проекты';
+            projectsList.innerHTML = `<div class="empty-state"><p style="color: var(--danger);">Ошибка: ${escapeHtml(errorMessage)}</p><p style="margin-top: 10px; font-size: 12px;">Проверьте настройки сервера в меню пользователя.</p></div>`;
+        }
+        throw error; // Пробрасываем ошибку дальше
     }
 }
 
@@ -379,6 +396,19 @@ export async function selectProject(projectId) {
             if (rightTitle) {
                 rightTitle.textContent = 'Ежедневник';
             }
+            
+            // На мобильных скрываем секцию заметок при загрузке списка (без выбора конкретной заметки)
+            if (window.innerWidth <= 768) {
+                const notesSection = document.querySelector('.notes-section');
+                const closeNotesBtn = document.getElementById('closeNotesBtn');
+                if (notesSection) {
+                    notesSection.classList.remove('task-selected');
+                    document.body.style.overflow = '';
+                }
+                if (closeNotesBtn) {
+                    closeNotesBtn.style.display = 'none';
+                }
+            }
         } else if (projectId === 0) {
             // Для "Все задачи" загружаем все задачи из всех проектов
             const leftTitle = document.getElementById('leftSectionTitle');
@@ -494,8 +524,21 @@ export async function selectProject(projectId) {
             }
             await loadTasks();
             
-            // Загружаем заметки (для конкретного проекта)
-            await loadNotes();
+        // Загружаем заметки (для конкретного проекта)
+        await loadNotes();
+        
+        // На мобильных скрываем секцию заметок при выборе проекта без задачи
+        if (window.innerWidth <= 768) {
+            const notesSection = document.querySelector('.notes-section');
+            const closeNotesBtn = document.getElementById('closeNotesBtn');
+            if (notesSection && !selectedTaskId) {
+                notesSection.classList.remove('task-selected');
+                document.body.style.overflow = '';
+            }
+            if (closeNotesBtn) {
+                closeNotesBtn.style.display = 'none';
+            }
+        }
         }
     }
 }

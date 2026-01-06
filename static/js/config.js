@@ -5,7 +5,7 @@
 let API_BASE_URL = '';
 
 // Проверяем, запущено ли в Capacitor приложении
-function isCapacitor() {
+export function isCapacitor() {
     return window.Capacitor !== undefined;
 }
 

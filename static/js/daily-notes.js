@@ -119,6 +119,19 @@ export async function selectDailyNote(noteId) {
         if (deadlineSection) {
             deadlineSection.style.display = 'none';
         }
+        
+        // На мобильных показываем секцию заметок как overlay
+        if (window.innerWidth <= 768) {
+            const notesSection = document.querySelector('.notes-section');
+            const closeNotesBtn = document.getElementById('closeNotesBtn');
+            if (notesSection) {
+                notesSection.classList.add('task-selected');
+                document.body.style.overflow = 'hidden';
+            }
+            if (closeNotesBtn) {
+                closeNotesBtn.style.display = 'flex';
+            }
+        }
     } catch (error) {
         console.error('Ошибка загрузки заметки:', error);
     }

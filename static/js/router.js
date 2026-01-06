@@ -97,10 +97,15 @@ async function restoreStateFromParams(params) {
             }
         }
         
-        // Восстанавливаем выбранную задачу
+        // Восстанавливаем выбранную задачу (после загрузки задач)
         if (params.task && params.task !== selectedTaskId) {
-            const { selectTaskForDescription } = await import('./tasks.js');
-            await selectTaskForDescription(params.task);
+            // Ждем загрузки задач перед выбором
+            const { loadTasks, selectTaskForDescription } = await import('./tasks.js');
+            await loadTasks();
+            // Небольшая задержка для рендеринга DOM
+            setTimeout(async () => {
+                await selectTaskForDescription(params.task);
+            }, 100);
         }
         
         // Восстанавливаем режим паролей

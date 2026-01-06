@@ -19,9 +19,27 @@ export async function apiFetch(path, options = {}) {
     
     try {
         const response = await fetch(url, config);
+        
+        // Логируем ошибки для отладки
+        if (!response.ok) {
+            console.error(`API Error (${path}):`, {
+                status: response.status,
+                statusText: response.statusText,
+                url: url
+            });
+        }
+        
         return response;
     } catch (error) {
-        console.error(`API Error (${path}):`, error);
+        console.error(`API Error (${path}):`, {
+            error: error,
+            message: error.message,
+            url: url
+        });
+        // Улучшаем сообщение об ошибке
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            throw new Error(`Не удалось подключиться к серверу. Проверьте, что сервер запущен и IP адрес указан правильно.`);
+        }
         throw error;
     }
 }
